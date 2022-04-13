@@ -20,6 +20,18 @@ describe('createCoinbaseButton', () => {
     expect(width).toBe('100%');
     expect(height).toBe('20vh');
   });
+
+  it('allows for experience type override', () => {
+    const iframe = createCoinbaseButton({
+      ...DEFAULT_ARGS,
+      experienceLoggedin: 'popup',
+      experienceLoggedout: 'popup',
+    });
+
+    const url = new URL(iframe.src);
+    expect(url.searchParams.get('experience_loggedin')).toBe('popup');
+    expect(url.searchParams.get('experience_loggedout')).toBe('popup');
+  });
 });
 
 const DEFAULT_ARGS: Parameters<typeof createCoinbaseButton>[0] = {
