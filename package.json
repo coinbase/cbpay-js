@@ -20,9 +20,9 @@
     "lint": "eslint . --ext .js,.ts,.tsx --quiet",
     "clean": "rimraf lib cjs *.tsbuildinfo cbpay-sdk*",
     "prepare": "yarn run build",
-    "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "build-and-zip": "yarn build && mkdir -p cbpay-sdk && cp package.json cbpay-sdk/package.json && cp -r dist cbpay-sdk/dist && tar -czf cbpay-sdk.tgz cbpay-sdk && rm -rf cbpay-sdk",
-    "check-ci": "yarn run type-check && yarn run lint && yarn run test"
+    "check-ci": "yarn run typecheck && yarn run lint && yarn run test"
   },
   "devDependencies": {
     "@swc/core": "^1.2.146",
