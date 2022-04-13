@@ -1,12 +1,12 @@
-import { DEFAULT_HOST } from 'config';
+import { DEFAULT_HOST } from '../config';
 import { EmbeddedContentStyles, Experience } from 'types/widget';
 import { createEmbeddedContent, EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
-import { JsonObject } from '../types/JsonTypes';
+import { JsonObject } from 'types/JsonTypes';
 import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
 import { EventMetadata } from 'types/events';
 
 const PIXEL_PATH = '/embed';
-const PIXEL_ID = 'coinbase-sdk-connect';
+export const PIXEL_ID = 'coinbase-sdk-connect';
 
 const PopupSizes: Record<'signin' | 'widget', { width: number; height: number }> = {
   signin: {
