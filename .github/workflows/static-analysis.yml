@@ -1,0 +1,27 @@
+name: CBPay-JS tests
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  test:
+    name: 'Node ${{ matrix.node }}'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [14, 16]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install Dependencies
+        uses: bahmutov/npm-install@v1
+      - name: TypeCheck
+        run: yarn typecheck
+      - name: Lint
+        run: yarn lint
+      - name: Unit Tests
+        run: yarn jest
