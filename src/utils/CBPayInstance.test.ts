@@ -1,4 +1,4 @@
-import { CoinbasePixel, PIXEL_ID } from './CoinbasePixel';
+import { PIXEL_ID } from './CoinbasePixel';
 import { CBPayInstance } from './CBPayInstance';
 
 describe('CBPayInstance', () => {
