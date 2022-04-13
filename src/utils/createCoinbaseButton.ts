@@ -1,11 +1,12 @@
 import { IntegrationType, Experience } from '../types/widget';
+import { DEFAULT_HOST } from '../config';
 
 const BUTTON_PATH = '/embed/button';
 
 type ButtonExperience = Exclude<Experience, 'new_tab'>;
 
 export const createCoinbaseButton = ({
-  host,
+  host = DEFAULT_HOST,
   appId,
   experienceLoggedin = 'embedded',
   experienceLoggedout = 'embedded',
@@ -15,7 +16,7 @@ export const createCoinbaseButton = ({
   height = '48px',
 }: {
   appId: string;
-  host: string;
+  host?: string;
   experienceLoggedin?: ButtonExperience;
   experienceLoggedout?: ButtonExperience;
   type?: IntegrationType;
