@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Salus Security Scan
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Salus Scan
       id: salus_scan
       uses: federacy/scan-action@0.1.4
