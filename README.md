@@ -1,6 +1,6 @@
 # @coinbase/cbpay-js
 
-This repository houses the source code for the Coinbase Pay Javascript SDK.
+This repository houses the source code for the Coinbase Pay JavaScript SDK.
 
 ## Contributing
 
