@@ -1,5 +1,5 @@
 {
-  "name": "@coinbase/pay",
+  "name": "@coinbase/cbpay-js",
   "version": "0.0.1",
   "license": "SEE LICENSE IN LICENSE.md",
   "main": "dist/index.js",
@@ -10,7 +10,8 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsup",
@@ -21,7 +22,6 @@
     "clean": "rimraf lib cjs *.tsbuildinfo cbpay-sdk*",
     "prepare": "yarn run build",
     "typecheck": "tsc --noEmit",
-    "build-and-zip": "yarn build && mkdir -p cbpay-sdk && cp package.json cbpay-sdk/package.json && cp -r dist cbpay-sdk/dist && tar -czf cbpay-sdk.tgz cbpay-sdk && rm -rf cbpay-sdk",
     "check-ci": "yarn run typecheck && yarn run lint && yarn run test"
   },
   "devDependencies": {
