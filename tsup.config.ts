@@ -7,4 +7,5 @@ export default defineConfig({
   clean: true,
   dts: true,
   format: ['cjs', 'esm'],
+  target: 'es5',
 });
