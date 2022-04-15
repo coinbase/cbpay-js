@@ -13,7 +13,7 @@ jobs:
         with:
           versionsAsRoot: true
           type: majors
-          preset: '>=12'
+          preset: '^12 || ^14 || >= 16'
 
   test:
     needs: [matrix]
@@ -22,9 +22,6 @@ jobs:
     strategy:
       matrix:
         node-version: ${{ fromJson(needs.matrix.outputs.latest) }}
-        exclude:
-          - node-version: 13
-          - node-version: 15
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
