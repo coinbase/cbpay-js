@@ -3,17 +3,30 @@ name: Unit Tests
 on: [pull_request]
 
 jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      latest: ${{ steps.set-matrix.outputs.requireds }}
+    steps:
+      - uses: ljharb/actions/node/matrix@main
+        id: set-matrix
+        with:
+          versionsAsRoot: true
+          type: majors
+          preset: '>=4'
+
   test:
-    name: 'On Node ${{ matrix.node }}'
+    needs: [matrix]
+    name: 'On Node ${{ matrix.node-version }}'
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16]
+        node-version: ${{ fromJson(needs.matrix.outputs.latest) }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1
       - name: Unit Tests
