@@ -4,7 +4,6 @@ on: [pull_request]
 
 jobs:
   test:
-    name: 'Lint/Type-check'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
