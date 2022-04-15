@@ -1,9 +1,10 @@
-name: Lint and Type-check
+name: Static Analysis
 
 on: [pull_request]
 
 jobs:
   static-analysis:
+    name: 'Lint and Type-check'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

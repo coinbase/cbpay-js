@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   test:
-    name: 'Node ${{ matrix.node }}'
+    name: 'On Node ${{ matrix.node }}'
     runs-on: ubuntu-latest
     strategy:
       matrix:
