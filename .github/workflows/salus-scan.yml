@@ -1,9 +1,10 @@
+name: Salus Security Scan
+
 on: [pull_request]
 
 jobs:
-  salus_scan_job:
+  scan:
     runs-on: ubuntu-latest
-    name: Salus Security Scan
     steps:
     - uses: actions/checkout@v2
     - name: Salus Scan

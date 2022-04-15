@@ -1,19 +1,16 @@
-name: CBPay-JS tests
+name: Static Analysis
 
 on: [pull_request]
 
 jobs:
-  test:
-    name: 'Node ${{ matrix.node }}'
+  static-analysis:
+    name: 'Lint and Type-check'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [14, 16]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 16
       - name: Install Dependencies
         uses: bahmutov/npm-install@v1
       - name: TypeCheck
