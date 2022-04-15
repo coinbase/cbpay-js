@@ -13,7 +13,7 @@ jobs:
         with:
           versionsAsRoot: true
           type: majors
-          preset: '>=10'
+          preset: '>=12'
 
   test:
     needs: [matrix]
