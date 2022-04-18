@@ -12,5 +12,6 @@ lerna-debug.log
 .filmstrip
 *.tsbuildinfo
 
-cbpay-sdk.tgz
+package/
+coinbase-cbpay-js-*.tgz
 .vscode
