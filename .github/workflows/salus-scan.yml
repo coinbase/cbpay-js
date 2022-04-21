@@ -1,6 +1,6 @@
 name: Salus Security Scan
 
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   scan:
