@@ -1,6 +1,6 @@
 {
   "name": "@coinbase/cbpay-js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
