@@ -6,11 +6,14 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
-    },
+    ".": [
+      {
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./dist/index.js"
+    ],
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -41,7 +44,10 @@
     "jest-chrome": "^0.7.2",
     "prettier": "^2.5.1",
     "ts-jest": "^27.1.3",
-    "tsup": "^5.11.13",
+    "tsup": "^5.12.6",
     "typescript": "^4.4.4"
+  },
+  "engines": {
+    "node": ">= 12"
   }
 }
