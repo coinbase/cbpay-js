@@ -61,7 +61,7 @@ instance.destroy();
 
 ## React example
 
-```jsx
+```tsx
 import { initOnramp } from '@coinbase/cbpay-js';
 
 const PayWithCoinbaseButton: React.FC = () => {
