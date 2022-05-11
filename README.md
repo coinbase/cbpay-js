@@ -32,9 +32,9 @@ const destinationWallets = [
   },
 ];
 
-const instance = initonramp({
+const instance = initOnramp({
   target: '#button-container',
-  appId: ‘your_app_id’,
+  appId: 'your_app_id',
   widgetParameters: {
     destinationWallets,
   },
@@ -64,12 +64,12 @@ instance.destroy();
 ```jsx
 import { initOnramp } from '@coinbase/cbpay-js';
 
-export const PayWithCoinbaseButton: React.FC = () => {
+const PayWithCoinbaseButton: React.FC = () => {
   const onrampInstance = useRef();
 
   useEffect(() => {
-    onrampInstance.current = initonramp({
-      appId: ‘your_app_id’,
+    onrampInstance.current = initOnramp({
+      appId: 'your_app_id',
       widgetParameters: {
         destinationWallets: [
           {
@@ -102,11 +102,7 @@ export const PayWithCoinbaseButton: React.FC = () => {
     onrampInstance.current?.open();
   };
 
-  return (
-    <Button onClick={handleClick}>
-      Buy with Coinbase
-    </Button>
-  );
+  return <Button onClick={handleClick}>Buy with Coinbase</Button>;
 };
 ```
 
