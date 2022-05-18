@@ -19,7 +19,6 @@ jobs:
     needs: [matrix]
     name: 'On Node ${{ matrix.node-version }}'
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.node-version == 18 && true || false }}
     strategy:
       fail-fast: false
       matrix:
