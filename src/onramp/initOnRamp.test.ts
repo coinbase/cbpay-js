@@ -7,7 +7,7 @@ describe('initOnRamp', () => {
       experienceLoggedIn: 'popup',
       experienceLoggedOut: 'popup',
       appId: 'abc123',
-      widgetParameters: { destinationWallets: [], amount: { value: 0, currencySymbol: 'ETH' } },
+      widgetParameters: { destinationWallets: [] },
     });
 
     expect(instance instanceof CBPayInstance).toBe(true);

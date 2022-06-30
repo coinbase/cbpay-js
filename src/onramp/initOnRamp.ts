@@ -2,16 +2,17 @@ import { CBPayExperienceOptions } from '../types/widget';
 import { CBPayInstance, CBPayInstanceType } from '../utils/CBPayInstance';
 import { DestinationWallet } from '../types/onramp';
 
-type Amount = {
-  /** fiat currency code (e.g. USD, EUR) */
-  currencySymbol: string;
-  value: number;
-};
-
 type OnRampAppParams = {
+  /** The destination wallets supported by your application (BTC, ETH, etc). */
   destinationWallets: DestinationWallet[];
-  // TODO: add support for amount
-  amount?: Amount;
+  /** The preset input amount as a crypto value. i.e. 0.1 ETH. This will be the initial default for all cryptocurrencies. */
+  presetCryptoAmount?: number;
+  /**
+   * The preset input amount as a fiat value. i.e. 15 USD.
+   * This will be the initial default for all cryptocurrencies. Ignored if presetCryptoAmount is also set.
+   * Also note this only works for a subset of fiat currencies: USD, CAD, GBP, EUR
+   * */
+  presetFiatAmount?: number;
 };
 
 type InitOnRampParams = CBPayExperienceOptions<OnRampAppParams>;
