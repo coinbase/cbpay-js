@@ -1,18 +1,19 @@
 import { DEFAULT_HOST } from '../config';
-import { DestinationWallet } from '../types/onramp';
+import { OnRampAppParams } from '../types/onramp';
 import { parseDestinationWallets } from '../utils/parseDestinationWallets';
+
+export type GenerateOnRampURLOptions = {
+  appId: string;
+  host?: string;
+} & OnRampAppParams;
 
 export const generateOnRampURL = ({
   appId,
-  destinationWallets,
-  paymentMethodsSupported = [],
   host = DEFAULT_HOST,
-}: {
-  appId: string;
-  destinationWallets: DestinationWallet[];
-  paymentMethodsSupported?: { type: string }[];
-  host?: string;
-}): string => {
+  destinationWallets,
+  presetFiatAmount,
+  presetCryptoAmount,
+}: GenerateOnRampURLOptions): string => {
   const url = new URL(host);
   url.pathname = '/buy/select-asset';
 
@@ -21,7 +22,13 @@ export const generateOnRampURL = ({
     'destinationWallets',
     JSON.stringify(parseDestinationWallets(destinationWallets)),
   );
-  url.searchParams.append('paymentMethodsSupported', JSON.stringify(paymentMethodsSupported));
+
+  if (presetFiatAmount) {
+    url.searchParams.append('presetFiatAmount', presetFiatAmount?.toString());
+  }
+  if (presetCryptoAmount) {
+    url.searchParams.append('presetCryptoAmount', presetCryptoAmount?.toString());
+  }
 
   return url.toString();
 };
