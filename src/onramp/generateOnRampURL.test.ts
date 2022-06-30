@@ -8,7 +8,7 @@ describe('generateOnrampURL', () => {
         appId: 'test',
         destinationWallets: [],
       }),
-    ).toEqual(`${BASE_URL}?appId=test&${EMPTY_DESTINATION_WALLETS}&${EMPTY_PM_SUPPORTED}`);
+    ).toEqual(`${BASE_URL}?appId=test&${EMPTY_DESTINATION_WALLETS}`);
   });
 
   it('generates URL with non-empty wallet info', () => {
@@ -35,39 +35,35 @@ describe('generateOnrampURL', () => {
           '0x5ome4ddre55': ['ethereum', 'avalanche-c-chain', 'APE'],
           '90123jd09ef09df': ['solana'],
         }),
-      )}&${EMPTY_PM_SUPPORTED}`,
+      )}`,
     );
   });
 
   it('should support dynamic appId', () => {
     expect(generateOnRampURL({ appId: 'foobar', destinationWallets: [] })).toEqual(
-      `${BASE_URL}?appId=foobar&${EMPTY_DESTINATION_WALLETS}&${EMPTY_PM_SUPPORTED}`,
+      `${BASE_URL}?appId=foobar&${EMPTY_DESTINATION_WALLETS}`,
     );
   });
 
   it('should support dynamic host', () => {
     expect(
       generateOnRampURL({ appId: 'test', destinationWallets: [], host: 'http://localhost:3000' }),
-    ).toEqual(
-      `http://localhost:3000/buy/select-asset?appId=test&${EMPTY_DESTINATION_WALLETS}&${EMPTY_PM_SUPPORTED}`,
-    );
+    ).toEqual(`http://localhost:3000/buy/select-asset?appId=test&${EMPTY_DESTINATION_WALLETS}`);
   });
 
-  it('should support dynamic payment methods', () => {
+  it('should support preset amounts', () => {
     expect(
       generateOnRampURL({
         appId: 'test',
         destinationWallets: [],
-        paymentMethodsSupported: [{ type: 'debit' }],
+        presetCryptoAmount: 0.1,
+        presetFiatAmount: 20,
       }),
     ).toEqual(
-      `${BASE_URL}?appId=test&${EMPTY_DESTINATION_WALLETS}&paymentMethodsSupported=${encodeURIComponent(
-        JSON.stringify([{ type: 'debit' }]),
-      )}`,
+      `${BASE_URL}?appId=test&${EMPTY_DESTINATION_WALLETS}&presetFiatAmount=20&presetCryptoAmount=0.1`,
     );
   });
 });
 
 const BASE_URL = 'https://pay.coinbase.com/buy/select-asset';
 const EMPTY_DESTINATION_WALLETS = `destinationWallets=${encodeURIComponent(JSON.stringify({}))}`;
-const EMPTY_PM_SUPPORTED = `paymentMethodsSupported=${encodeURIComponent(JSON.stringify([]))}`;
