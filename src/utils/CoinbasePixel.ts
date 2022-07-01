@@ -198,8 +198,8 @@ export class CoinbasePixel {
   private sendAppParams = (appParams: JsonObject, callback?: () => void): void => {
     if (this.nonce) {
       callback?.();
-    } else if (this.pixelIframe) {
-      broadcastPostMessage(this.pixelIframe.contentWindow as Window, 'app_params', {
+    } else if (this.pixelIframe && this.pixelIframe.contentWindow) {
+      broadcastPostMessage(this.pixelIframe.contentWindow, 'app_params', {
         data: appParams,
       });
       this.onMessage('on_app_params_nonce', {
