@@ -13,6 +13,7 @@ export type SupportedBlockchains =
   | 'ethereum'
   | 'ethereum-classic'
   | 'filecoin'
+  | 'flow'
   | 'horizen'
   | 'litecoin'
   | 'polkadot'
