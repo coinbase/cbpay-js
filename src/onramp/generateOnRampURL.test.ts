@@ -2,16 +2,31 @@ import { DestinationWallet } from '../types/onramp';
 import { generateOnRampURL } from './generateOnRampURL';
 
 describe('generateOnrampURL', () => {
-  it('generates URL with empty destination wallets', () => {
-    expect(
+  it('generates URL with expected default parameters', () => {
+    const url = new URL(
       generateOnRampURL({
         appId: 'test',
         destinationWallets: [],
       }),
-    ).toEqual(`${BASE_URL}?appId=test&${EMPTY_DESTINATION_WALLETS}`);
+    );
+
+    expect(url.origin).toEqual('https://pay.coinbase.com');
+    expect(url.pathname).toEqual('/buy/select-asset');
+    expect(url.searchParams.get('appId')).toEqual('test');
   });
 
-  it('generates URL with non-empty wallet info', () => {
+  it('generates URL with empty destination wallets', () => {
+    const url = new URL(
+      generateOnRampURL({
+        appId: 'test',
+        destinationWallets: [],
+      }),
+    );
+
+    expect(url.searchParams.get('destinationWallets')).toEqual('[]');
+  });
+
+  it('generates URL with multiple destination wallet configs', () => {
     const destinationWallets: DestinationWallet[] = [
       {
         address: '0x5ome4ddre55',
@@ -24,31 +39,30 @@ describe('generateOnrampURL', () => {
       },
     ];
 
-    expect(
+    const url = new URL(
       generateOnRampURL({
         appId: 'test',
         destinationWallets,
       }),
-    ).toEqual(
-      `${BASE_URL}?appId=test&destinationWallets=${encodeURIComponent(
-        JSON.stringify({
-          '0x5ome4ddre55': ['ethereum', 'avalanche-c-chain', 'APE'],
-          '90123jd09ef09df': ['solana'],
-        }),
-      )}`,
     );
-  });
 
-  it('should support dynamic appId', () => {
-    expect(generateOnRampURL({ appId: 'foobar', destinationWallets: [] })).toEqual(
-      `${BASE_URL}?appId=foobar&${EMPTY_DESTINATION_WALLETS}`,
+    expect(url.searchParams.get('destinationWallets')).toEqual(
+      `[{\"address\":\"0x5ome4ddre55\",\"blockchains\":[\"ethereum\",\"avalanche-c-chain\"],\"assets\":[\"APE\"]},{\"address\":\"90123jd09ef09df\",\"blockchains\":[\"solana\"]}]`,
     );
   });
 
   it('should support dynamic host', () => {
-    expect(
-      generateOnRampURL({ appId: 'test', destinationWallets: [], host: 'http://localhost:3000' }),
-    ).toEqual(`http://localhost:3000/buy/select-asset?appId=test&${EMPTY_DESTINATION_WALLETS}`);
+    const url = new URL(
+      generateOnRampURL({
+        host: 'http://localhost:3000',
+        appId: 'test',
+        destinationWallets: [],
+      }),
+    );
+
+    expect(url.origin).toEqual('http://localhost:3000');
+    expect(url.pathname).toEqual('/buy/select-asset');
+    expect(url.searchParams.get('appId')).toEqual('test');
   });
 
   it('should support preset amounts', () => {
