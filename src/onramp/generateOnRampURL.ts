@@ -8,27 +8,26 @@ export type GenerateOnRampURLOptions = {
 } & OnRampAppParams;
 
 export const generateOnRampURL = ({
-  appId,
   host = DEFAULT_HOST,
   destinationWallets,
-  presetFiatAmount,
-  presetCryptoAmount,
+  ...otherParams
 }: GenerateOnRampURLOptions): string => {
   const url = new URL(host);
   url.pathname = '/buy/select-asset';
 
-  url.searchParams.append('appId', appId);
   url.searchParams.append(
     'destinationWallets',
     JSON.stringify(parseDestinationWallets(destinationWallets)),
   );
 
-  if (presetFiatAmount) {
-    url.searchParams.append('presetFiatAmount', presetFiatAmount?.toString());
-  }
-  if (presetCryptoAmount) {
-    url.searchParams.append('presetCryptoAmount', presetCryptoAmount?.toString());
-  }
+  (Object.keys(otherParams) as (keyof typeof otherParams)[]).forEach((key) => {
+    const value = otherParams[key];
+    if (value !== undefined) {
+      url.searchParams.append(key, value.toString());
+    }
+  });
+
+  url.searchParams.sort();
 
   return url.toString();
 };

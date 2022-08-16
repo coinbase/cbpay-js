@@ -52,16 +52,28 @@ describe('generateOnrampURL', () => {
   });
 
   it('should support preset amounts', () => {
-    expect(
+    const url = new URL(
       generateOnRampURL({
         appId: 'test',
         destinationWallets: [],
         presetCryptoAmount: 0.1,
         presetFiatAmount: 20,
       }),
-    ).toEqual(
-      `${BASE_URL}?appId=test&${EMPTY_DESTINATION_WALLETS}&presetFiatAmount=20&presetCryptoAmount=0.1`,
     );
+
+    expect(url.searchParams.get('presetFiatAmount')).toEqual('20');
+    expect(url.searchParams.get('presetCryptoAmount')).toEqual('0.1');
+  });
+
+  it('should support defaultNetwork', () => {
+    const url = new URL(
+      generateOnRampURL({
+        appId: 'test',
+        destinationWallets: [],
+        defaultNetwork: 'polygon',
+      }),
+    );
+    expect(url.searchParams.get('defaultNetwork')).toEqual('polygon');
   });
 });
 
