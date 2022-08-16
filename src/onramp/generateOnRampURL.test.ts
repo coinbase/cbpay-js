@@ -34,6 +34,11 @@ describe('generateOnrampURL', () => {
         assets: ['APE'],
       },
       {
+        address: '0x5ome4ddre55',
+        assets: ['MATIC'],
+        supportedNetworks: ['polygon'],
+      },
+      {
         address: '90123jd09ef09df',
         blockchains: ['solana'],
       },
@@ -47,7 +52,7 @@ describe('generateOnrampURL', () => {
     );
 
     expect(url.searchParams.get('destinationWallets')).toEqual(
-      `[{\"address\":\"0x5ome4ddre55\",\"blockchains\":[\"ethereum\",\"avalanche-c-chain\"],\"assets\":[\"APE\"]},{\"address\":\"90123jd09ef09df\",\"blockchains\":[\"solana\"]}]`,
+      `[{\"address\":\"0x5ome4ddre55\",\"blockchains\":[\"ethereum\",\"avalanche-c-chain\"],\"assets\":[\"APE\"]},{\"address\":\"0x5ome4ddre55\",\"assets\":[\"MATIC\"],\"supportedNetworks\":[\"polygon\"]},{\"address\":\"90123jd09ef09df\",\"blockchains\":[\"solana\"]}]`,
     );
   });
 
