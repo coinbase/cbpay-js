@@ -95,6 +95,3 @@ describe('generateOnrampURL', () => {
     expect(url.searchParams.get('defaultNetwork')).toEqual('polygon');
   });
 });
-
-const BASE_URL = 'https://pay.coinbase.com/buy/select-asset';
-const EMPTY_DESTINATION_WALLETS = `destinationWallets=${encodeURIComponent(JSON.stringify({}))}`;
