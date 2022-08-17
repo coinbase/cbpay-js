@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2022-07-17
+
+- Add parameters to add options for L2 destination wallet configs.
+- Update generateOnRampURL formatting.
+- Remove the typing for blockchains parameter.
+- Add flow as supported network.
+
+
 ## [1.0.2] - 2022-06-30
 
 - Add preset amount parameters support.
