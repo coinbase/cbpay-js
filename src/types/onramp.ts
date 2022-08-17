@@ -23,9 +23,14 @@ export type SupportedBlockchains =
   | 'zcash';
 
 export type DestinationWallet = {
+  /* Destination address where the purchased assets will be sent. */
   address: string;
-  blockchains?: SupportedBlockchains[];
+  /** List of networks enabled for the associated address. All assets available per network are displayed to the user. */
+  blockchains?: string[];
+  /** List of assets enabled for the associated address. They are appended to the available list of assets. */
   assets?: string[];
+  /** Restrict the networks available for the associated assets. */
+  supportedNetworks?: string[];
 };
 
 export type OnRampAppParams = {
@@ -39,4 +44,6 @@ export type OnRampAppParams = {
    * Also note this only works for a subset of fiat currencies: USD, CAD, GBP, EUR
    * */
   presetFiatAmount?: number;
+  /** The default network that should be selected when multiple networks are present. */
+  defaultNetwork?: string;
 };
