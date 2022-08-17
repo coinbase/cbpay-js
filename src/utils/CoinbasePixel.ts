@@ -25,7 +25,7 @@ export type ExperienceListeners = {
   onEvent?: (event: EventMetadata) => void;
 };
 
-type CoinbasePixelConstructorParams = {
+export type CoinbasePixelConstructorParams = {
   host?: string;
   appId: string;
   appParams: JsonObject;
@@ -101,7 +101,7 @@ export class CoinbasePixel {
         const openEmbeddedExperience = () => {
           const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
           if (embeddedContentStyles?.target) {
-            document.querySelector(embeddedContentStyles?.target)?.appendChild(embedded);
+            document.querySelector(embeddedContentStyles?.target)?.replaceChildren(embedded);
           } else {
             document.body.appendChild(embedded);
           }
