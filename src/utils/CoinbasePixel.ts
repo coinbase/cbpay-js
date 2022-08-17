@@ -159,18 +159,10 @@ export class CoinbasePixel {
     this.onMessage('pixel_ready', {
       shouldUnsubscribe: false,
       onMessage: (data) => {
-        this.isLoggedIn = !!data?.isLoggedIn as boolean;
-        this.sendAppParams(this.appParams);
-      },
-    });
-
-    // First time only. Pixel is considered ready when we've setup the
-    // app params for the first time - this avoids race conditions with nonces when opening.
-    this.onMessage('on_app_params_nonce', {
-      shouldUnsubscribe: true,
-      onMessage: () => {
         this.isReady = true;
+        this.isLoggedIn = !!data?.isLoggedIn as boolean;
         this.onReadyCallback?.();
+        this.sendAppParams(this.appParams);
       },
     });
 
