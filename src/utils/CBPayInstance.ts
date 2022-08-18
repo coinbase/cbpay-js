@@ -1,6 +1,6 @@
 import { JsonObject } from 'types/JsonTypes';
 import { CBPayExperienceOptions, Experience, WidgetType } from 'types/widget';
-import { CoinbasePixel } from './CoinbasePixel';
+import { CoinbasePixel, CoinbasePixelConstructorParams } from './CoinbasePixel';
 
 export type InternalExperienceOptions = Omit<
   CBPayExperienceOptions<JsonObject>,
@@ -12,7 +12,8 @@ export type InternalExperienceOptions = Omit<
 
 export type CBPayInstanceConstructorArguments = {
   appParams: JsonObject;
-} & InternalExperienceOptions;
+} & InternalExperienceOptions &
+  Pick<CoinbasePixelConstructorParams, 'onFallbackOpen'>;
 
 const widgetRoutes: Record<WidgetType, string> = {
   buy: '/buy',
@@ -29,17 +30,13 @@ export class CBPayInstance implements CBPayInstanceType {
   private options: InternalExperienceOptions;
 
   constructor(options: CBPayInstanceConstructorArguments) {
-    const appParams = {
-      widget: options.widget,
-      ...options.appParams,
-    };
-
     this.options = options;
     this.pixel = new CoinbasePixel({
-      host: options.host,
-      appId: options.appId,
-      appParams,
-      onReady: options.onReady,
+      ...options,
+      appParams: {
+        widget: options.widget,
+        ...options.appParams,
+      },
     });
 
     if (options.target) {

@@ -19,7 +19,8 @@ export type CBPayExperienceOptions<T> = {
   target?: string;
   appId: string;
   host?: string;
-  onReady?: () => void;
+  debug?: boolean;
+  onReady?: (error?: Error) => void;
   onExit?: (error?: Error) => void;
   onSuccess?: () => void;
   onEvent?: (event: EventMetadata) => void;
