@@ -167,12 +167,81 @@ describe('CoinbasePixel', () => {
     expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
   });
 
-  it.todo('should handle queued open options');
-  it.todo('should handle opening the embedded experience when logged in');
-  it.todo('should handle opening the embedded experience when logged out');
-  it.todo('should handle opening the popup experience in chrome extensions');
+  it('should handle queued open options', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    instance.openExperience(defaultOpenOptions); // trigger queued open
+    mockPixelReady();
+    mockOnAppParamsNonce('mock-nonce');
+
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
+  });
+
+  it('should handle opening the embedded experience when logged out', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    mockPixelReady(false);
+    mockOnAppParamsNonce('mock-nonce');
+    instance.openExperience(defaultOpenOptions);
+
+    expect(window.open).toHaveBeenCalledWith(
+      'https://pay.coinbase.com/signin?appId=test&type=direct',
+      'Coinbase',
+      'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=730,width=460',
+    );
+    expect(findMockedListeners('signin_success')).toHaveLength(1);
+  });
+
+  it('should handle opening the popup experience in chrome extensions', () => {
+    window.chrome = {
+      // @ts-expect-error - test
+      windows: {
+        create: jest.fn(),
+      },
+    };
+
+    const instance = new CoinbasePixel(defaultArgs);
+
+    mockPixelReady(false);
+    mockOnAppParamsNonce('mock-nonce');
+    instance.openExperience({ ...defaultOpenOptions, experienceLoggedIn: 'popup' });
+
+    expect(window.chrome.windows.create).toHaveBeenCalledWith(
+      {
+        focused: true,
+        height: 730,
+        left: -470,
+        setSelfAsOpener: true,
+        top: 0,
+        type: 'popup',
+        url: 'https://pay.coinbase.com/buy?appId=test&type=secure_standalone&nonce=mock-nonce',
+        width: 460,
+      },
+      expect.any(Function),
+    );
+  });
+
+  it('should handle opening the new_tab experience in chrome extensions', () => {
+    window.chrome = {
+      // @ts-expect-error - test
+      tabs: {
+        create: jest.fn(),
+      },
+    };
+
+    const instance = new CoinbasePixel(defaultArgs);
+
+    mockPixelReady(false);
+    mockOnAppParamsNonce('mock-nonce');
+    instance.openExperience({ ...defaultOpenOptions, experienceLoggedIn: 'new_tab' });
+
+    expect(window.chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://pay.coinbase.com/buy?appId=test&type=secure_standalone&nonce=mock-nonce',
+    });
+  });
+
   it.todo('should handle opening the popup experience in browsers');
-  it.todo('should handle opening the new_tab experience in chrome extensions');
+
   it.todo('should handle opening the new_tab experience in browsers');
 
   it('should handle max timeout for ready status', () => {
@@ -202,12 +271,12 @@ function createUntypedPixel(options: CoinbasePixelConstructorParams) {
   return new CoinbasePixel(options) as any;
 }
 
-function mockPixelReady() {
+function mockPixelReady(isLoggedIn = true) {
   const onMessageCall = (onBroadcastedPostMessage as jest.Mock).mock.calls.find(
     ([message]) => message === 'pixel_ready',
   );
   expect(onMessageCall).toBeTruthy();
-  onMessageCall[1].onMessage({ isLoggedIn: true });
+  onMessageCall[1].onMessage({ isLoggedIn });
 }
 
 function mockOnAppParamsNonce(nonce: string) {
@@ -217,4 +286,8 @@ function mockOnAppParamsNonce(nonce: string) {
   onMessageCalls.forEach((call) => {
     call[1].onMessage({ nonce });
   });
+}
+
+function findMockedListeners(message: string) {
+  return (onBroadcastedPostMessage as jest.Mock).mock.calls.filter(([m]) => m === message);
 }
