@@ -98,7 +98,7 @@ export class CoinbasePixel {
 
   /** Opens the CB Pay experience */
   public openExperience = (options: OpenExperienceOptions): void => {
-    this.log('Attempting to open experience', `state:${this.state}`);
+    this.log('Attempting to open experience', { state: this.state });
 
     // Avoid double clicking when we are waiting on a response for a new nonce
     if (this.state === 'waiting_for_response') {
@@ -130,7 +130,7 @@ export class CoinbasePixel {
         ? experienceLoggedIn
         : experienceLoggedOut || experienceLoggedIn;
 
-      this.log('Opening experience', `[experience:${experience}]`);
+      this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
       widgetUrl.searchParams.append('nonce', nonce);
       const url = widgetUrl.toString();
 
@@ -213,6 +213,7 @@ export class CoinbasePixel {
     });
   };
 
+  /** Creates and adds the pixel to the document */
   private embedPixel = (): void => {
     document.getElementById(PIXEL_ID)?.remove();
     const pixel = createPixel({
@@ -220,7 +221,6 @@ export class CoinbasePixel {
       appId: this.appId,
     });
 
-    // Pixel failed to load in general
     pixel.onerror = this.onFailedToLoad;
 
     this.pixelIframe = pixel;

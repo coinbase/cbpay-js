@@ -38,6 +38,8 @@ describe('CoinbasePixel', () => {
   });
 
   afterEach(() => {
+    document.getElementById(PIXEL_ID)?.remove();
+    document.getElementById(EMBEDDED_IFRAME_ID)?.remove();
     jest.resetAllMocks();
   });
 
@@ -120,9 +122,44 @@ describe('CoinbasePixel', () => {
     expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
   });
 
-  it.todo('should handle openExperience when pixel has status "loading"');
-  it.todo('should handle openExperience when pixel has status "waiting_for_response"');
-  it.todo('should handle openExperience when pixel has status "failed"');
+  it('should handle openExperience when pixel has status "loading"', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    expect(instance.state).toEqual('loading');
+    instance.openExperience(defaultOpenOptions);
+
+    expect(instance.queuedOpenOptions).toBeTruthy();
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
+  });
+
+  it('should handle openExperience when pixel has status "waiting_for_response"', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    instance.state = 'waiting_for_response';
+    instance.openExperience(defaultOpenOptions);
+
+    expect(instance.queuedOpenOptions).toBeFalsy();
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
+  });
+
+  it('should handle openExperience when pixel has status "failed"', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    instance.state = 'failed';
+    instance.openExperience(defaultOpenOptions);
+
+    expect(instance.queuedOpenOptions).toBeFalsy();
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
+  });
+
+  it.todo('should handle openExperience with no preloaded nonce');
+  it.todo('should handle queued open options');
+  it.todo('should handle opening the embedded experience when logged in');
+  it.todo('should handle opening the embedded experience when logged out');
+  it.todo('should handle opening the popup experience in chrome extensions');
+  it.todo('should handle opening the popup experience in browsers');
+  it.todo('should handle opening the new_tab experience in chrome extensions');
+  it.todo('should handle opening the new_tab experience in browsers');
 
   it('should handle max timeout for ready status', () => {
     jest.useFakeTimers();
