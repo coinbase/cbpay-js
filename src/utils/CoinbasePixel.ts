@@ -190,6 +190,7 @@ export class CoinbasePixel {
 
   public destroy = (): void => {
     document.getElementById(PIXEL_ID)?.remove();
+    this.queuedOpenOptions = undefined;
     this.unsubs.forEach((unsub) => unsub());
   };
 
