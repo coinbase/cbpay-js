@@ -17,6 +17,7 @@ describe('CoinbasePixel', () => {
   window.open = jest.fn();
 
   let mockOnReady: jest.Mock;
+  let mockUnsubCallback: jest.Mock;
   let mockOnFallbackOpen: jest.Mock;
   let defaultArgs: CoinbasePixelConstructorParams;
   const defaultAppParams = {
@@ -30,7 +31,8 @@ describe('CoinbasePixel', () => {
   beforeEach(() => {
     mockOnReady = jest.fn();
     mockOnFallbackOpen = jest.fn();
-    (onBroadcastedPostMessage as jest.Mock).mockReturnValue(jest.fn());
+    mockUnsubCallback = jest.fn();
+    (onBroadcastedPostMessage as jest.Mock).mockReturnValue(mockUnsubCallback);
     defaultArgs = {
       appId: 'test',
       appParams: defaultAppParams,
@@ -42,6 +44,8 @@ describe('CoinbasePixel', () => {
   afterEach(() => {
     document.getElementById(PIXEL_ID)?.remove();
     document.getElementById(EMBEDDED_IFRAME_ID)?.remove();
+    // @ts-expect-error - test
+    window.chrome = undefined;
     jest.resetAllMocks();
   });
 
@@ -76,11 +80,17 @@ describe('CoinbasePixel', () => {
   });
 
   it('.destroy should remove embedded pixel', () => {
-    const pixel = new CoinbasePixel(defaultArgs);
+    const pixel = createUntypedPixel(defaultArgs);
     expect(document.querySelector(`iframe#${PIXEL_ID}`)).toBeTruthy();
+
+    mockPixelReady();
+    mockOnAppParamsNonce('mock-nonce');
+
+    expect(pixel.unsubs).toHaveLength(2);
 
     pixel.destroy();
     expect(document.querySelector(`iframe#${PIXEL_ID}`)).toBeNull();
+    expect(mockUnsubCallback).toHaveBeenCalledTimes(2);
   });
 
   it('should handle pixel_ready message', () => {
@@ -240,9 +250,33 @@ describe('CoinbasePixel', () => {
     });
   });
 
-  it.todo('should handle opening the popup experience in browsers');
+  it('should handle opening the popup experience in browsers', () => {
+    const instance = new CoinbasePixel(defaultArgs);
 
-  it.todo('should handle opening the new_tab experience in browsers');
+    mockPixelReady(false);
+    mockOnAppParamsNonce('mock-nonce');
+    instance.openExperience({ ...defaultOpenOptions, experienceLoggedIn: 'popup' });
+
+    expect(window.open).toHaveBeenCalledWith(
+      'https://pay.coinbase.com/buy?appId=test&type=secure_standalone&nonce=mock-nonce',
+      'Coinbase',
+      'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=730,width=460',
+    );
+  });
+
+  it('should handle opening the new_tab experience in browsers', () => {
+    const instance = new CoinbasePixel(defaultArgs);
+
+    mockPixelReady(false);
+    mockOnAppParamsNonce('mock-nonce');
+    instance.openExperience({ ...defaultOpenOptions, experienceLoggedIn: 'new_tab' });
+
+    expect(window.open).toHaveBeenCalledWith(
+      'https://pay.coinbase.com/buy?appId=test&type=secure_standalone&nonce=mock-nonce',
+      'Coinbase',
+      undefined,
+    );
+  });
 
   it('should handle max timeout for ready status', () => {
     jest.useFakeTimers();
@@ -261,8 +295,6 @@ describe('CoinbasePixel', () => {
     jest.useRealTimers();
     console.warn = originalWarn;
   });
-
-  it.todo('should unsubscribe from messages');
 });
 
 // Used to assert private properties without type errors
