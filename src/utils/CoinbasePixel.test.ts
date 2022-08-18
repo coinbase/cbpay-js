@@ -1,4 +1,5 @@
 import { CoinbasePixel, PIXEL_ID, CoinbasePixelConstructorParams } from './CoinbasePixel';
+import { EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
 
 import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
 
@@ -88,6 +89,8 @@ describe('CoinbasePixel', () => {
     ).toEqual(2);
 
     expect(instance.isLoggedIn).toEqual(true);
+    expect(instance.isReady).toEqual(true);
+    expect(mockOnReady).toHaveBeenCalledWith();
   });
 
   it('should handle on_app_params_nonce', () => {
@@ -97,9 +100,23 @@ describe('CoinbasePixel', () => {
     mockOnAppParamsNonce('mock-nonce');
 
     expect(instance.nonce).toEqual('mock-nonce');
-    expect(instance.isReady).toEqual(true);
-    expect(mockOnReady).toHaveBeenCalledWith();
   });
+
+  it('should handle openExperience when pixel is ready', () => {
+    const pixel = new CoinbasePixel(defaultArgs);
+
+    mockPixelReady();
+    mockOnAppParamsNonce('mock-nonce');
+
+    pixel.openExperience({
+      path: '/buy',
+      experienceLoggedIn: 'embedded',
+    });
+
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
+  });
+
+  it.todo('should handle openExperience when pixel is not ready');
 
   it.todo('should unsubscribe from messages');
 });
