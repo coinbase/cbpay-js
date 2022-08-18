@@ -60,12 +60,42 @@ export const onBroadcastedPostMessage = (
   };
 };
 
+export type SdkTarget = Window | { postMessage: typeof window.postMessage };
+
+export const getSdkTarget = (win: Window): SdkTarget | undefined => {
+  if (win !== window) {
+    // Internal to SDK
+    return win;
+  } else if (isMobileSdkTarget(win)) {
+    // Mobile SDK
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return { postMessage: (message: string) => win.ReactNativeWebView!.postMessage!(message) };
+  } else if (win.opener) {
+    // Button proxy
+    return win.opener;
+  } else if (win.parent !== win.self) {
+    // Third party / SDK
+    return win.parent;
+  } else {
+    return undefined;
+  }
+};
+
+const isMobileSdkTarget = (win: Window) => {
+  try {
+    return win.ReactNativeWebView?.postMessage !== undefined;
+  } catch {
+    return false;
+  }
+};
+
 export const broadcastPostMessage = (
-  win: Window,
+  win: SdkTarget,
   eventName: MessageCode,
   { allowedOrigin = '*', data }: { allowedOrigin?: string; data?: MessageData } = {},
 ): void => {
-  win.postMessage(formatPostMessage(eventName, data), allowedOrigin);
+  const message = formatPostMessage(eventName, data);
+  win.postMessage(message, allowedOrigin);
 };
 
 const parsePostMessage = (data: string): PostMessageData => {

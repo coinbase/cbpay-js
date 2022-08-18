@@ -1,13 +1,13 @@
 /**
  * @jest-environment jsdom
  */
-import { onBroadcastedPostMessage, broadcastPostMessage } from './postMessage';
+import { onBroadcastedPostMessage, broadcastPostMessage, getSdkTarget } from './postMessage';
 
 const flushMessages = () => new Promise((resolve) => setTimeout(resolve, 10));
 
 const domain = 'https://coinbase.com';
 
-const patchOriginEvent = (event: MessageEvent<unknown>) => {
+const patchOriginEvent = (event: MessageEvent) => {
   if (event.origin === '') {
     event.stopImmediatePropagation();
     const eventWithOrigin = new MessageEvent('message', {
@@ -30,9 +30,9 @@ describe('postMessage', () => {
   describe('onBroadcastedPostMessage', () => {
     it('triggers callback on message', async () => {
       const callbackMock = jest.fn();
-      onBroadcastedPostMessage('app_ready', { onMessage: callbackMock });
+      onBroadcastedPostMessage('pixel_ready', { onMessage: callbackMock });
 
-      window.postMessage('app_ready', '*');
+      window.postMessage('pixel_ready', '*');
 
       await flushMessages();
 
@@ -45,12 +45,12 @@ describe('postMessage', () => {
     ])('validates origin for %s', async (allowedOrigin, isCallbackExpected) => {
       const callbackMock = jest.fn();
       const onValidateOriginMock = jest.fn(async (origin) => origin === allowedOrigin);
-      onBroadcastedPostMessage('app_ready', {
+      onBroadcastedPostMessage('pixel_ready', {
         onMessage: callbackMock,
         onValidateOrigin: onValidateOriginMock,
       });
 
-      window.postMessage('app_ready', '*');
+      window.postMessage('pixel_ready', '*');
 
       await flushMessages();
 
@@ -64,12 +64,12 @@ describe('postMessage', () => {
       ['https://bad-website.com', false],
     ])('triggers callback for allowedOrigin for %s', async (allowedOrigin, isCallbackExpected) => {
       const callbackMock = jest.fn();
-      onBroadcastedPostMessage('app_ready', {
+      onBroadcastedPostMessage('pixel_ready', {
         onMessage: callbackMock,
         allowedOrigin,
       });
 
-      window.postMessage('app_ready', '*');
+      window.postMessage('pixel_ready', '*');
 
       await flushMessages();
 
@@ -94,26 +94,75 @@ describe('postMessage', () => {
     });
 
     it('sends post message', async () => {
-      broadcastPostMessage(window, 'app_ready');
+      broadcastPostMessage(window, 'pixel_ready');
 
       await flushMessages();
 
       expect(onMessageMock).toBeCalledWith({
-        data: 'app_ready',
+        data: 'pixel_ready',
         origin: 'https://coinbase.com',
       });
     });
 
     it('sends formats data correctly', async () => {
-      broadcastPostMessage(window, 'app_ready', { data: { test: 'hi' } });
+      broadcastPostMessage(window, 'pixel_ready', { data: { test: 'hi' } });
 
       await flushMessages();
 
       expect(onMessageMock).toBeCalledWith(
         expect.objectContaining({
-          data: '{"eventName":"app_ready","data":{"test":"hi"}}',
+          data: '{"eventName":"pixel_ready","data":{"test":"hi"}}',
         }),
       );
+    });
+  });
+
+  describe('getSdkTarget', () => {
+    type RNWindow = Window & typeof globalThis & { ReactNativeWebView: unknown };
+
+    const originalOpener = window.opener;
+    const originalParent = Object.getOwnPropertyDescriptor(window, 'parent') ?? {};
+
+    afterEach(() => {
+      window.opener = originalOpener;
+      Object.defineProperty(window, 'parent', originalParent);
+      delete (window as RNWindow).ReactNativeWebView;
+    });
+
+    it("returns the widget's window when called from the SDK internally", () => {
+      const otherWin = {} as Window; // TODO: Get a different window object somehow?
+      const target = getSdkTarget(otherWin);
+
+      expect(target).toBe(otherWin);
+    });
+
+    it('else returns a postMessage object for RN (Mobile SDK)', () => {
+      const ReactNativeWebView = {
+        postMessage: jest.fn(),
+      };
+      (window as RNWindow).ReactNativeWebView = ReactNativeWebView;
+      const target = getSdkTarget(window);
+      target?.postMessage('test', '');
+
+      expect(ReactNativeWebView.postMessage).toHaveBeenCalledTimes(1);
+    });
+
+    it("else returns the window's opener (Button Proxy) ", () => {
+      const opener = {} as unknown as Window;
+      window.opener = opener;
+      const target = getSdkTarget(window);
+
+      expect(target).toBe(opener);
+    });
+
+    it('else returns parent window (Third party / SDK)', () => {
+      const parent = {} as unknown as Window;
+      Object.defineProperty(window, 'parent', {
+        get: () => parent,
+      });
+      const target = getSdkTarget(window);
+
+      expect(target).toBe(parent);
     });
   });
 });
