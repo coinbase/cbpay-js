@@ -1,4 +1,9 @@
-import { CoinbasePixel, PIXEL_ID, CoinbasePixelConstructorParams } from './CoinbasePixel';
+import {
+  CoinbasePixel,
+  PIXEL_ID,
+  CoinbasePixelConstructorParams,
+  OpenExperienceOptions,
+} from './CoinbasePixel';
 import { EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
 
 import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
@@ -10,18 +15,25 @@ jest.mock('./postMessage', () => ({
 
 describe('CoinbasePixel', () => {
   let mockOnReady: jest.Mock;
+  let mockOnFallbackOpen: jest.Mock;
   let defaultArgs: CoinbasePixelConstructorParams;
   const defaultAppParams = {
     parameter: 'mock-app-params',
   };
+  const defaultOpenOptions: OpenExperienceOptions = {
+    path: '/buy',
+    experienceLoggedIn: 'embedded',
+  };
 
   beforeEach(() => {
     mockOnReady = jest.fn();
+    mockOnFallbackOpen = jest.fn();
     (onBroadcastedPostMessage as jest.Mock).mockReturnValue(jest.fn());
     defaultArgs = {
       appId: 'test',
       appParams: defaultAppParams,
       onReady: mockOnReady,
+      onFallbackOpen: mockOnFallbackOpen,
     };
   });
 
@@ -37,22 +49,17 @@ describe('CoinbasePixel', () => {
     expect(instance.pixelIframe).toEqual(expect.any(HTMLIFrameElement));
     expect(instance.nonce).toEqual('');
     expect(instance.onReadyCallback).toEqual(mockOnReady);
-    expect(instance.unsubs.length).toEqual(2);
+    expect(instance.unsubs.length).toEqual(1);
     expect(instance.appParams).toEqual(defaultArgs.appParams);
-    expect(instance.isReady).toEqual(false);
+    expect(instance.state).toEqual('loading');
     expect(instance.isLoggedIn).toEqual(false);
   });
 
-  it('should setup default listeners', () => {
+  it('should setup pixel ready listener', () => {
     createUntypedPixel(defaultArgs);
 
-    expect(onBroadcastedPostMessage).toHaveBeenCalledTimes(2);
+    expect(onBroadcastedPostMessage).toHaveBeenCalledTimes(1);
     expect(onBroadcastedPostMessage).toHaveBeenCalledWith('pixel_ready', {
-      allowedOrigin: 'https://pay.coinbase.com',
-      onMessage: expect.any(Function),
-      shouldUnsubscribe: false,
-    });
-    expect(onBroadcastedPostMessage).toHaveBeenCalledWith('on_app_params_nonce', {
       allowedOrigin: 'https://pay.coinbase.com',
       onMessage: expect.any(Function),
       shouldUnsubscribe: false,
@@ -81,15 +88,14 @@ describe('CoinbasePixel', () => {
       data: defaultAppParams,
     });
 
-    // 2 listeners now for nonce callback
     expect(
       (onBroadcastedPostMessage as jest.Mock).mock.calls.filter(
         ([message]) => message === 'on_app_params_nonce',
       ).length,
-    ).toEqual(2);
+    ).toEqual(1);
 
     expect(instance.isLoggedIn).toEqual(true);
-    expect(instance.isReady).toEqual(true);
+    expect(instance.state).toEqual('waiting_for_response');
     expect(mockOnReady).toHaveBeenCalledWith();
   });
 
@@ -100,6 +106,7 @@ describe('CoinbasePixel', () => {
     mockOnAppParamsNonce('mock-nonce');
 
     expect(instance.nonce).toEqual('mock-nonce');
+    expect(instance.state).toEqual('ready');
   });
 
   it('should handle openExperience when pixel is ready', () => {
@@ -108,15 +115,32 @@ describe('CoinbasePixel', () => {
     mockPixelReady();
     mockOnAppParamsNonce('mock-nonce');
 
-    pixel.openExperience({
-      path: '/buy',
-      experienceLoggedIn: 'embedded',
-    });
+    pixel.openExperience(defaultOpenOptions);
 
     expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
   });
 
-  it.todo('should handle openExperience when pixel is not ready');
+  it.todo('should handle openExperience when pixel has status "loading"');
+  it.todo('should handle openExperience when pixel has status "waiting_for_response"');
+  it.todo('should handle openExperience when pixel has status "failed"');
+
+  it('should handle max timeout for ready status', () => {
+    jest.useFakeTimers();
+    const originalWarn = console.warn;
+    console.warn = jest.fn();
+
+    const instance = createUntypedPixel(defaultArgs);
+
+    instance.openExperience(defaultOpenOptions); // trigger queued open
+    jest.advanceTimersToNextTimer();
+
+    expect(instance.state).toEqual('failed');
+    expect(mockOnReady).toHaveBeenCalledWith(expect.any(Error));
+    expect(mockOnFallbackOpen).toHaveBeenCalled();
+
+    jest.useRealTimers();
+    console.warn = originalWarn;
+  });
 
   it.todo('should unsubscribe from messages');
 });

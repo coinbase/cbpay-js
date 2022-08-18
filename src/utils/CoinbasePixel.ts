@@ -38,7 +38,7 @@ export type CoinbasePixelConstructorParams = {
   debug?: boolean;
 };
 
-type OpenExperienceOptions = {
+export type OpenExperienceOptions = {
   path: string;
   experienceLoggedIn: Experience;
   experienceLoggedOut?: Experience;
@@ -54,7 +54,6 @@ export class CoinbasePixel {
    * - waiting_for_response:  Waiting for a post message response.
    */
   private state: 'loading' | 'ready' | 'waiting_for_response' | 'failed' = 'loading';
-  private maxLoadTimeout: number = DEFAULT_MAX_LOAD_TIMEOUT;
   /** A reference to a queued options to open the experience with if pixel isn't ready */
   private queuedOpenOptions: OpenExperienceOptions | undefined;
   private debug: boolean;
@@ -69,7 +68,6 @@ export class CoinbasePixel {
   private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
   private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
 
-  public isReady = false;
   public isLoggedIn = false;
 
   constructor({
@@ -89,6 +87,13 @@ export class CoinbasePixel {
 
     this.addPixelReadyListener();
     this.embedPixel();
+
+    // Setup a timeout for errors that might stop the window from loading i.e. CSP
+    setTimeout(() => {
+      if (this.state !== 'ready') {
+        this.onFailedToLoad();
+      }
+    }, DEFAULT_MAX_LOAD_TIMEOUT);
   }
 
   /** Opens the CB Pay experience */
@@ -187,12 +192,12 @@ export class CoinbasePixel {
     this.unsubs.forEach((unsub) => unsub());
   };
 
+  /** Adds a listener for when the pixel is ready and requests an app params nonce when ready */
   private addPixelReadyListener = (): void => {
     this.onMessage('pixel_ready', {
       shouldUnsubscribe: false,
       onMessage: (data) => {
         this.log('Received message: pixel_ready');
-        this.isReady = true;
         this.isLoggedIn = !!data?.isLoggedIn as boolean;
         this.onReadyCallback?.();
 
@@ -214,13 +219,6 @@ export class CoinbasePixel {
       host: this.host,
       appId: this.appId,
     });
-
-    // Setup a timeout for errors that might stop the window from loading i.e. CSP
-    setTimeout(() => {
-      if (this.state !== 'ready') {
-        this.onFailedToLoad();
-      }
-    }, this.maxLoadTimeout);
 
     // Pixel failed to load in general
     pixel.onerror = this.onFailedToLoad;
@@ -273,8 +271,6 @@ export class CoinbasePixel {
       broadcastPostMessage(this.pixelIframe.contentWindow, 'app_params', {
         data: appParams,
       });
-
-      // TODO: set timeout here as well
     } else {
       // Shouldn't be here after loading the pixel.
       console.error('Failed to find pixel content window');
@@ -285,24 +281,22 @@ export class CoinbasePixel {
   };
 
   private setupExperienceListeners = ({ onSuccess, onExit, onEvent }: ExperienceListeners) => {
-    if (onEvent) {
-      this.onMessage('event', {
-        shouldUnsubscribe: false,
-        onMessage: (data) => {
-          const metadata = data as EventMetadata;
+    this.onMessage('event', {
+      shouldUnsubscribe: false,
+      onMessage: (data) => {
+        const metadata = data as EventMetadata;
 
-          this.eventStreamListeners[metadata.eventName]?.forEach((cb) => cb?.());
+        this.eventStreamListeners[metadata.eventName]?.forEach((cb) => cb?.());
 
-          if (metadata.eventName === 'success') {
-            onSuccess?.();
-          }
-          if (metadata.eventName === 'exit') {
-            onExit?.(metadata.error);
-          }
-          onEvent(data as EventMetadata);
-        },
-      });
-    }
+        if (metadata.eventName === 'success') {
+          onSuccess?.();
+        }
+        if (metadata.eventName === 'exit') {
+          onExit?.(metadata.error);
+        }
+        onEvent?.(data as EventMetadata);
+      },
+    });
   };
 
   private startDirectSignin = (callback: () => void) => {
