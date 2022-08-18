@@ -14,6 +14,8 @@ jest.mock('./postMessage', () => ({
 }));
 
 describe('CoinbasePixel', () => {
+  window.open = jest.fn();
+
   let mockOnReady: jest.Mock;
   let mockOnFallbackOpen: jest.Mock;
   let defaultArgs: CoinbasePixelConstructorParams;
@@ -152,7 +154,19 @@ describe('CoinbasePixel', () => {
     expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
   });
 
-  it.todo('should handle openExperience with no preloaded nonce');
+  it('should handle openExperience with no preloaded nonce', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    instance.state = 'ready';
+    instance.isLoggedIn = true;
+    instance.openExperience(defaultOpenOptions);
+
+    expect(instance.state).toEqual('waiting_for_response');
+    mockOnAppParamsNonce('mock-nonce');
+
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
+  });
+
   it.todo('should handle queued open options');
   it.todo('should handle opening the embedded experience when logged in');
   it.todo('should handle opening the embedded experience when logged out');

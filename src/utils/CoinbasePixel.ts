@@ -130,9 +130,10 @@ export class CoinbasePixel {
         ? experienceLoggedIn
         : experienceLoggedOut || experienceLoggedIn;
 
-      this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
       widgetUrl.searchParams.append('nonce', nonce);
       const url = widgetUrl.toString();
+
+      this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
 
       if (experience === 'embedded') {
         const openEmbeddedExperience = () => {
