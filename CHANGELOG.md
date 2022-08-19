@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2022-07-17
+## [1.2.0] - 2022-08-19
+- Improve pixel internal state and message management.
+- Implement fallback open functionality for initOnRamp.
+- Add debug option for initOnRamp.
+
+## [1.1.0] - 2022-08-17
 
 - Add parameters to add options for L2 destination wallet configs.
 - Update generateOnRampURL formatting.
