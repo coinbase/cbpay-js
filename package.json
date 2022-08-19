@@ -50,7 +50,7 @@
   "engines": {
     "node": ">= 14"
   },
-  "dependencies": {
+  "peerDependencies": {
     "regenerator-runtime": "^0.13.9"
   }
 }
