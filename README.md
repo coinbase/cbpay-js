@@ -20,6 +20,20 @@ With `npm`:
 npm install @coinbase/cbpay-js
 ```
 
+The package is distributed as both ESModules and CommonJS. To use the CommonJS output, the `regenerator-runtime` package will also need to be installed:
+
+With `yarn`:
+
+```shell
+yarn add regenerator-runtime
+```
+
+With `npm`:
+
+```shell
+npm install regenerator-runtime
+```
+
 ## Basic example
 
 ```jsx
