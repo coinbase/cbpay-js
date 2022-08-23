@@ -52,5 +52,10 @@
   },
   "peerDependencies": {
     "regenerator-runtime": "^0.13.9"
+  },
+  "peerDependenciesMeta": {
+    "regenerator-runtime": {
+      "optional": true
+    }
   }
 }
