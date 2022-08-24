@@ -121,8 +121,7 @@ export class CoinbasePixel {
     }
 
     if (!this.nonce) {
-      // We don't have a nonce - what to do?
-      throw new Error('No nonce ready');
+      throw new Error('Attempted to open CB Pay experience without nonce');
     }
 
     const nonce = this.nonce;
@@ -191,6 +190,13 @@ export class CoinbasePixel {
     } else {
       openWindow(url, experience);
     }
+
+    // Add an event listener for when the widget opens so we can set a new nonce without invalidating the current nonce
+    const onOpen = () => {
+      this.sendAppParams();
+      this.removeEventStreamListener('open', onOpen);
+    };
+    this.addEventStreamListener('open', onOpen);
   };
 
   public endExperience = (): void => {
@@ -302,6 +308,13 @@ export class CoinbasePixel {
       this.eventStreamListeners[name]?.push(cb);
     } else {
       this.eventStreamListeners[name] = [cb];
+    }
+  };
+
+  private removeEventStreamListener = (name: EventMetadata['eventName'], callback: () => void) => {
+    if (this.eventStreamListeners[name]) {
+      const filteredListeners = this.eventStreamListeners[name]?.filter((cb) => cb !== callback);
+      this.eventStreamListeners[name] = filteredListeners;
     }
   };
 
