@@ -16,6 +16,7 @@ export type SupportedBlockchains =
   | 'flow'
   | 'horizen'
   | 'litecoin'
+  | 'optimism'
   | 'polkadot'
   | 'solana'
   | 'stellar'
