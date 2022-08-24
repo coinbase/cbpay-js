@@ -1,8 +1,10 @@
 import { initOnRamp } from './initOnRamp';
 import { CBPayInstance } from '../utils/CBPayInstance';
 
+jest.mock('../utils/CBPayInstance');
+
 describe('initOnRamp', () => {
-  it('should return CBPayInstance', () => {
+  it('should return CBPayInstance', async () => {
     let instance: unknown;
     initOnRamp(
       {
@@ -11,10 +13,15 @@ describe('initOnRamp', () => {
         appId: 'abc123',
         widgetParameters: { destinationWallets: [] },
       },
-      (_, i) => {
-        instance = i;
+      (_, newInstance) => {
+        instance = newInstance;
       },
     );
+
+    expect(CBPayInstance).toHaveBeenCalledTimes(1);
+
+    // Trigger ready callback
+    (CBPayInstance as jest.Mock).mock.calls[0][0].onReady();
 
     expect(instance instanceof CBPayInstance).toBe(true);
   });
