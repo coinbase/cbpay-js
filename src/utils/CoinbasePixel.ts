@@ -22,11 +22,6 @@ const PopupSizes: Record<'signin' | 'widget', { width: number; height: number }>
   },
 };
 
-export type OnReadyError = {
-  severity: 'warn' | 'error';
-  message: string;
-};
-
 export type ExperienceListeners = {
   onExit?: (data?: JsonObject) => void;
   onSuccess?: (data?: JsonObject) => void;
@@ -37,7 +32,7 @@ export type CoinbasePixelConstructorParams = {
   host?: string;
   appId: string;
   appParams: JsonObject;
-  onReady?: (error?: OnReadyError) => void;
+  onReady: (error?: Error) => void;
   /** Fallback open callback when the pixel failed to load */
   onFallbackOpen?: () => void;
   debug?: boolean;
@@ -191,7 +186,9 @@ export class CoinbasePixel {
       openWindow(url, experience);
     }
 
-    // Add an event listener for when the widget opens so we can set a new nonce without invalidating the current nonce
+    // For users who exit the experience and want to re-enter, we need a fresh nonce to use.
+    // Additionally, if we trigger sendParams to early we'll invalidate the nonce they're opening in this current attempt.
+    // Adding an event listener for when the widget opens allows us to safely request a new nonce for another session.
     const onOpen = () => {
       this.sendAppParams();
       this.removeEventStreamListener('open', onOpen);
@@ -239,11 +236,17 @@ export class CoinbasePixel {
 
   /** Failed to load the pixel iframe */
   private onFailedToLoad = () => {
-    const message = 'Failed to load CB Pay pixel. Falling back to opening in new tab.';
     this.state = 'failed';
-    console.warn(message);
-    // Only warning here since we're falling back to generate url function
-    this.onReadyCallback?.({ severity: 'warn', message });
+    const error = new Error('Failed to load CB Pay pixel. Falling back to opening in new tab.');
+
+    // If a fallback option is provided we only want to provide a warning since we can still attempt to open the widget
+    if (this.onFallbackOpen) {
+      if (this.debug) console.warn(error.message);
+      this.onReadyCallback?.();
+    } else {
+      // If no fallback option provided we're in a critical error state
+      this.onReadyCallback?.(error);
+    }
   };
 
   private sendAppParams = (callback?: () => void): void => {

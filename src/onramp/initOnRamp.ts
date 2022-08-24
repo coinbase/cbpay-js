@@ -2,14 +2,10 @@ import { CBPayExperienceOptions } from '../types/widget';
 import { CBPayInstance, CBPayInstanceType } from '../utils/CBPayInstance';
 import { OnRampAppParams } from '../types/onramp';
 import { generateOnRampURL } from './generateOnRampURL';
-import { OnReadyError } from 'utils/CoinbasePixel';
 
 export type InitOnRampParams = CBPayExperienceOptions<OnRampAppParams>;
 
-export type InitOnRampCallback = (
-  error: OnReadyError | undefined,
-  instance: CBPayInstanceType,
-) => void;
+export type InitOnRampCallback = (error: Error | undefined, instance: CBPayInstanceType) => void;
 
 export const initOnRamp = (
   {
