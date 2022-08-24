@@ -37,7 +37,7 @@ npm install regenerator-runtime
 ## Basic example
 
 ```jsx
-import { initOnramp } from '@coinbase/cbpay-js';
+import { initOnRamp } from '@coinbase/cbpay-js';
 
 const destinationWallets = [
   {
@@ -46,7 +46,7 @@ const destinationWallets = [
   },
 ];
 
-const instance = initOnramp({
+const instance = initOnRamp({
   target: '#button-container',
   appId: 'your_app_id',
   widgetParameters: {
@@ -76,13 +76,13 @@ instance.destroy();
 ## React example
 
 ```tsx
-import { initOnramp } from '@coinbase/cbpay-js';
+import { initOnRamp } from '@coinbase/cbpay-js';
 
 const PayWithCoinbaseButton: React.FC = () => {
   const onrampInstance = useRef();
 
   useEffect(() => {
-    onrampInstance.current = initOnramp({
+    onrampInstance.current = initOnRamp({
       appId: 'your_app_id',
       widgetParameters: {
         destinationWallets: [
