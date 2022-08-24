@@ -13,7 +13,7 @@ export type InternalExperienceOptions = Omit<
 export type CBPayInstanceConstructorArguments = {
   appParams: JsonObject;
 } & InternalExperienceOptions &
-  Pick<CoinbasePixelConstructorParams, 'onFallbackOpen'>;
+  Pick<CoinbasePixelConstructorParams, 'onFallbackOpen' | 'onReady'>;
 
 const widgetRoutes: Record<WidgetType, string> = {
   buy: '/buy',

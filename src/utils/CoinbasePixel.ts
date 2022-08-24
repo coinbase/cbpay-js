@@ -54,8 +54,6 @@ export class CoinbasePixel {
    * - waiting_for_response:  Waiting for a post message response.
    */
   private state: 'loading' | 'ready' | 'waiting_for_response' | 'failed' = 'loading';
-  /** A reference to a queued options to open the experience with if pixel isn't ready */
-  private queuedOpenOptions: OpenExperienceOptions | undefined;
   private debug: boolean;
 
   private host: string;
@@ -65,6 +63,7 @@ export class CoinbasePixel {
   private eventStreamListeners: Partial<Record<EventMetadata['eventName'], (() => void)[]>> = {};
   private unsubs: (() => void)[] = [];
   private appParams: JsonObject;
+  /** onReady callback which should be triggered when a nonce has successfully been retrieved */
   private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
   private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
 
@@ -107,7 +106,6 @@ export class CoinbasePixel {
 
     // Still waiting on pixel to load. Queue the options.
     if (this.state === 'loading') {
-      this.queuedOpenOptions = options;
       return;
     }
 
@@ -117,71 +115,76 @@ export class CoinbasePixel {
       return;
     }
 
+    if (!this.nonce) {
+      // We don't have a nonce - what to do?
+    }
+
+    const nonce = this.nonce;
+    this.nonce = '';
+
     this.setupExperienceListeners(options);
 
-    this.sendAppParams(this.appParams, (nonce) => {
-      const { path, experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
+    const { path, experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
 
-      const widgetUrl = new URL(`${this.host}${path}`);
-      widgetUrl.searchParams.append('appId', this.appId);
-      widgetUrl.searchParams.append('type', 'secure_standalone');
+    const widgetUrl = new URL(`${this.host}${path}`);
+    widgetUrl.searchParams.append('appId', this.appId);
+    widgetUrl.searchParams.append('type', 'secure_standalone');
 
-      const experience = this.isLoggedIn
-        ? experienceLoggedIn
-        : experienceLoggedOut || experienceLoggedIn;
+    const experience = this.isLoggedIn
+      ? experienceLoggedIn
+      : experienceLoggedOut || experienceLoggedIn;
 
-      widgetUrl.searchParams.append('nonce', nonce);
-      const url = widgetUrl.toString();
+    widgetUrl.searchParams.append('nonce', nonce);
+    const url = widgetUrl.toString();
 
-      this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
+    this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
 
-      if (experience === 'embedded') {
-        const openEmbeddedExperience = () => {
-          const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
-          if (embeddedContentStyles?.target) {
-            document.querySelector(embeddedContentStyles?.target)?.replaceChildren(embedded);
-          } else {
-            document.body.appendChild(embedded);
-          }
-        };
-
-        if (!this.isLoggedIn) {
-          // Embedded experience opens popup for signin
-          this.startDirectSignin(openEmbeddedExperience);
+    if (experience === 'embedded') {
+      const openEmbeddedExperience = () => {
+        const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
+        if (embeddedContentStyles?.target) {
+          document.querySelector(embeddedContentStyles?.target)?.replaceChildren(embedded);
         } else {
-          openEmbeddedExperience();
+          document.body.appendChild(embedded);
         }
-      } else if (experience === 'popup' && window.chrome?.windows?.create) {
-        void window.chrome.windows.create(
-          {
-            url,
-            setSelfAsOpener: true,
-            type: 'popup',
-            focused: true,
-            width: PopupSizes.signin.width,
-            height: PopupSizes.signin.height,
-            left: window.screenLeft - PopupSizes.signin.width - 10,
-            top: window.screenTop,
-          },
-          (winRef) => {
-            this.addEventStreamListener('open', () => {
-              if (winRef?.id) {
-                chrome.windows.update(winRef.id, {
-                  width: PopupSizes.widget.width,
-                  height: PopupSizes.widget.height,
-                  left: window.screenLeft - PopupSizes.widget.width - 10,
-                  top: window.screenTop,
-                });
-              }
-            });
-          },
-        );
-      } else if (experience === 'new_tab' && window.chrome?.tabs?.create) {
-        void window.chrome.tabs.create({ url });
+      };
+
+      if (!this.isLoggedIn) {
+        // Embedded experience opens popup for signin
+        this.startDirectSignin(openEmbeddedExperience);
       } else {
-        openWindow(url, experience);
+        openEmbeddedExperience();
       }
-    });
+    } else if (experience === 'popup' && window.chrome?.windows?.create) {
+      void window.chrome.windows.create(
+        {
+          url,
+          setSelfAsOpener: true,
+          type: 'popup',
+          focused: true,
+          width: PopupSizes.signin.width,
+          height: PopupSizes.signin.height,
+          left: window.screenLeft - PopupSizes.signin.width - 10,
+          top: window.screenTop,
+        },
+        (winRef) => {
+          this.addEventStreamListener('open', () => {
+            if (winRef?.id) {
+              chrome.windows.update(winRef.id, {
+                width: PopupSizes.widget.width,
+                height: PopupSizes.widget.height,
+                left: window.screenLeft - PopupSizes.widget.width - 10,
+                top: window.screenTop,
+              });
+            }
+          });
+        },
+      );
+    } else if (experience === 'new_tab' && window.chrome?.tabs?.create) {
+      void window.chrome.tabs.create({ url });
+    } else {
+      openWindow(url, experience);
+    }
   };
 
   public endExperience = (): void => {
@@ -190,7 +193,6 @@ export class CoinbasePixel {
 
   public destroy = (): void => {
     document.getElementById(PIXEL_ID)?.remove();
-    this.queuedOpenOptions = undefined;
     this.unsubs.forEach((unsub) => unsub());
   };
 
@@ -201,7 +203,6 @@ export class CoinbasePixel {
       onMessage: (data) => {
         this.log('Received message: pixel_ready');
         this.isLoggedIn = !!data?.isLoggedIn as boolean;
-        this.onReadyCallback?.();
 
         // Preload the app parameters immediately
         this.state = 'waiting_for_response';
@@ -209,7 +210,7 @@ export class CoinbasePixel {
           this.log('Pixel received app params nonce', nonce);
           this.state = 'ready';
           this.nonce = nonce;
-          this.runQueuedOpenExperience();
+          this.onReadyCallback?.();
         });
       },
     });
@@ -235,29 +236,9 @@ export class CoinbasePixel {
     this.state = 'failed';
     console.warn(message);
     this.onReadyCallback?.(new Error(message));
-    this.runQueuedOpenExperience();
-  };
-
-  /** Run any queued open experience options. Note: the window.open may not work outside of a click event and fail on browsers like Safari. */
-  private runQueuedOpenExperience = () => {
-    if (this.queuedOpenOptions) {
-      this.log('Running queued experience');
-      const options = { ...this.queuedOpenOptions };
-      this.queuedOpenOptions = undefined;
-      this.openExperience(options);
-    }
   };
 
   private sendAppParams = (appParams: JsonObject, callback?: (nonce: string) => void): void => {
-    // Preloaded nonce already exists.
-    if (this.nonce) {
-      const nonce = this.nonce;
-      this.nonce = '';
-      this.log('Using preloaded nonce', nonce);
-      callback?.(nonce);
-      return;
-    }
-
     // Fetch a new nonce from the pixel
     if (this.pixelIframe?.contentWindow) {
       this.log('Sending message: app_params');
