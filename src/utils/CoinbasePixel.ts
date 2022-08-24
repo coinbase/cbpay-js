@@ -216,7 +216,9 @@ export class CoinbasePixel {
         this.log('Received message: pixel_ready');
         this.isLoggedIn = !!data?.isLoggedIn as boolean;
 
-        this.sendAppParams();
+        this.sendAppParams(() => {
+          this.onReadyCallback?.();
+        });
       },
     });
   };
@@ -244,7 +246,7 @@ export class CoinbasePixel {
     this.onReadyCallback?.({ severity: 'warn', message });
   };
 
-  private sendAppParams = (): void => {
+  private sendAppParams = (callback?: () => void): void => {
     // Fetch a new nonce from the pixel
     if (this.pixelIframe?.contentWindow) {
       this.log('Sending message: app_params');
@@ -252,7 +254,7 @@ export class CoinbasePixel {
         onMessage: (data) => {
           this.state = 'ready';
           this.nonce = (data?.nonce as string) || '';
-          this.onReadyCallback?.();
+          callback?.();
         },
       });
 
