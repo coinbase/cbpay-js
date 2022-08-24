@@ -37,10 +37,9 @@ npm install regenerator-runtime
 ## Basic example
 
 ```jsx
-import type { CBPayInstanceType, InitOnRampParams } from '@coinbase/cbpay-js';
 import { initOnRamp } from '@coinbase/cbpay-js';
 
-const options: InitOnRampParams = {
+const options = {
   appId: 'your_app_id',
   widgetParameters: {
     destinationWallets: [{
@@ -65,7 +64,7 @@ const options: InitOnRampParams = {
 }
 
 // Initialize the CB Pay instance
-let onrampInstance: CBPayInstanceType;
+let onrampInstance;
 const instance = initOnRamp(options, (error, instance) => {
   onrampInstance = instance;
 });
