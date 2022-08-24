@@ -268,7 +268,26 @@ describe('CoinbasePixel', () => {
     );
   });
 
-  it('should handle max timeout for ready status', () => {
+  it('should handle max timeout for ready status with no fallback', () => {
+    jest.useFakeTimers();
+    const originalWarn = console.warn;
+    console.warn = jest.fn();
+
+    const instance = createUntypedPixel({
+      ...defaultArgs,
+      onFallbackOpen: undefined, // error path
+    });
+
+    jest.advanceTimersToNextTimer();
+
+    expect(instance.state).toEqual('failed');
+    expect(mockOnReady).toHaveBeenCalledWith(new Error('Failed to load CB Pay pixel'));
+
+    jest.useRealTimers();
+    console.warn = originalWarn;
+  });
+
+  it('should handle max timeout for ready status with fallback', () => {
     jest.useFakeTimers();
     const originalWarn = console.warn;
     console.warn = jest.fn();
@@ -278,10 +297,7 @@ describe('CoinbasePixel', () => {
     jest.advanceTimersToNextTimer();
 
     expect(instance.state).toEqual('failed');
-    expect(mockOnReady).toHaveBeenCalledWith({
-      message: 'Failed to load CB Pay pixel. Falling back to opening in new tab.',
-      severity: 'warn',
-    });
+    expect(mockOnReady).toHaveBeenCalledWith();
 
     instance.openExperience(defaultOpenOptions); // ensure fallback method opens
     expect(mockOnFallbackOpen).toHaveBeenCalled();

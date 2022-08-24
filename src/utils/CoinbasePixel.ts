@@ -237,15 +237,16 @@ export class CoinbasePixel {
   /** Failed to load the pixel iframe */
   private onFailedToLoad = () => {
     this.state = 'failed';
-    const error = new Error('Failed to load CB Pay pixel. Falling back to opening in new tab.');
 
     // If a fallback option is provided we only want to provide a warning since we can still attempt to open the widget
     if (this.onFallbackOpen) {
-      if (this.debug) console.warn(error.message);
+      if (this.debug) {
+        console.warn('Failed to load CB Pay pixel. Falling back to opening in new tab.');
+      }
       this.onReadyCallback?.();
     } else {
       // If no fallback option provided we're in a critical error state
-      this.onReadyCallback?.(error);
+      this.onReadyCallback?.(new Error('Failed to load CB Pay pixel'));
     }
   };
 
