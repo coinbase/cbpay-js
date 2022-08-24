@@ -14,15 +14,7 @@
       },
       "./dist/index.js"
     ],
-    "./package.json": "./package.json",
-    "./onramp/es5": [
-      {
-        "import": "./dist/onramp/es5/initOnRamp.mjs",
-        "types": "./dist/onramp/es5/initOnRamp.d.ts",
-        "default": "./dist/onramp/es5/initOnRamp.js"
-      },
-      "./dist/onramp/es5/initOnRamp.js"
-    ]
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",

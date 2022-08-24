@@ -1,5 +1,5 @@
 import { initOnRamp } from './initOnRamp';
-import { CBPayInstance } from '../../utils/CBPayInstance';
+import { CBPayInstance } from '../utils/CBPayInstance';
 
 describe('initOnRamp', () => {
   it('should return CBPayInstance', () => {

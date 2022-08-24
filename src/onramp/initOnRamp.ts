@@ -1,13 +1,38 @@
-import { CBPayInstanceType } from 'utils/CBPayInstance';
-import { initOnRamp as initOnRampSync, InitOnRampParams } from './es5/initOnRamp';
+import { CBPayExperienceOptions } from '../types/widget';
+import { CBPayInstance, CBPayInstanceType } from '../utils/CBPayInstance';
+import { OnRampAppParams } from '../types/onramp';
+import { generateOnRampURL } from './generateOnRampURL';
+import { OnReadyError } from 'utils/CoinbasePixel';
 
-export const initOnRamp = (options: InitOnRampParams): Promise<CBPayInstanceType> =>
-  new Promise((res, rej) => {
-    initOnRampSync(options, (error, instance) => {
-      if (error) {
-        rej(error);
-      } else {
-        res(instance);
-      }
-    });
+export type InitOnRampParams = CBPayExperienceOptions<OnRampAppParams>;
+
+export type InitOnRampCallback = (
+  error: OnReadyError | undefined,
+  instance: CBPayInstanceType,
+) => void;
+
+export const initOnRamp = (
+  {
+    experienceLoggedIn = 'embedded', // default experience type
+    widgetParameters,
+    ...options
+  }: InitOnRampParams,
+  callback: InitOnRampCallback,
+): void => {
+  const instance = new CBPayInstance({
+    ...options,
+    widget: 'buy',
+    experienceLoggedIn,
+    appParams: widgetParameters,
+    onReady: (error) => {
+      callback(error, instance);
+    },
+    onFallbackOpen: () => {
+      const url = generateOnRampURL({
+        ...options,
+        ...widgetParameters,
+      });
+      window.open(url);
+    },
   });
+};

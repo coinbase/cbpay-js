@@ -22,6 +22,11 @@ const PopupSizes: Record<'signin' | 'widget', { width: number; height: number }>
   },
 };
 
+export type OnReadyError = {
+  severity: 'warn' | 'error';
+  message: string;
+};
+
 export type ExperienceListeners = {
   onExit?: (data?: JsonObject) => void;
   onSuccess?: (data?: JsonObject) => void;
@@ -32,7 +37,7 @@ export type CoinbasePixelConstructorParams = {
   host?: string;
   appId: string;
   appParams: JsonObject;
-  onReady?: (error?: Error) => void;
+  onReady?: (error?: OnReadyError) => void;
   /** Fallback open callback when the pixel failed to load */
   onFallbackOpen?: () => void;
   debug?: boolean;
@@ -117,6 +122,7 @@ export class CoinbasePixel {
 
     if (!this.nonce) {
       // We don't have a nonce - what to do?
+      throw new Error('No nonce ready');
     }
 
     const nonce = this.nonce;
@@ -204,14 +210,7 @@ export class CoinbasePixel {
         this.log('Received message: pixel_ready');
         this.isLoggedIn = !!data?.isLoggedIn as boolean;
 
-        // Preload the app parameters immediately
-        this.state = 'waiting_for_response';
-        this.sendAppParams(this.appParams, (nonce) => {
-          this.log('Pixel received app params nonce', nonce);
-          this.state = 'ready';
-          this.nonce = nonce;
-          this.onReadyCallback?.();
-        });
+        this.sendAppParams();
       },
     });
   };
@@ -235,24 +234,25 @@ export class CoinbasePixel {
     const message = 'Failed to load CB Pay pixel. Falling back to opening in new tab.';
     this.state = 'failed';
     console.warn(message);
-    this.onReadyCallback?.(new Error(message));
+    // Only warning here since we're falling back to generate url function
+    this.onReadyCallback?.({ severity: 'warn', message });
   };
 
-  private sendAppParams = (appParams: JsonObject, callback?: (nonce: string) => void): void => {
+  private sendAppParams = (): void => {
     // Fetch a new nonce from the pixel
     if (this.pixelIframe?.contentWindow) {
       this.log('Sending message: app_params');
       this.onMessage('on_app_params_nonce', {
         onMessage: (data) => {
           this.state = 'ready';
-          const nonce = (data?.nonce as string) || '';
-          callback?.(nonce);
+          this.nonce = (data?.nonce as string) || '';
+          this.onReadyCallback?.();
         },
       });
 
       this.state = 'waiting_for_response';
       broadcastPostMessage(this.pixelIframe.contentWindow, 'app_params', {
-        data: appParams,
+        data: this.appParams,
       });
     } else {
       // Shouldn't be here after loading the pixel.
