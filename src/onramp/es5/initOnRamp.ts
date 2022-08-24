@@ -1,7 +1,7 @@
-import { CBPayExperienceOptions } from '../types/widget';
-import { CBPayInstance, CBPayInstanceType } from '../utils/CBPayInstance';
-import { OnRampAppParams } from '../types/onramp';
-import { generateOnRampURL } from './generateOnRampURL';
+import { CBPayExperienceOptions } from '../../types/widget';
+import { CBPayInstance, CBPayInstanceType } from '../../utils/CBPayInstance';
+import { OnRampAppParams } from '../../types/onramp';
+import { generateOnRampURL } from '../generateOnRampURL';
 
 export type InitOnRampParams = CBPayExperienceOptions<OnRampAppParams>;
 
