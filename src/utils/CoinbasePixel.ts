@@ -187,7 +187,7 @@ export class CoinbasePixel {
     }
 
     // For users who exit the experience and want to re-enter, we need a fresh nonce to use.
-    // Additionally, if we trigger sendParams to early we'll invalidate the nonce they're opening in this current attempt.
+    // Additionally, if we trigger sendAppParams to early we'll invalidate the nonce they're opening in this current attempt.
     // Adding an event listener for when the widget opens allows us to safely request a new nonce for another session.
     const onOpen = () => {
       this.sendAppParams();
