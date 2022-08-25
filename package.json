@@ -16,6 +16,12 @@
     ],
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "LICENSE.md",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "start": "npm-watch",
