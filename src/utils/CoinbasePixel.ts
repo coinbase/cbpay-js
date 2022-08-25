@@ -187,7 +187,7 @@ export class CoinbasePixel {
     }
 
     // For users who exit the experience and want to re-enter, we need a fresh nonce to use.
-    // Additionally, if we trigger sendAppParams to early we'll invalidate the nonce they're opening in this current attempt.
+    // Additionally, if we trigger sendAppParams too early we'll invalidate the nonce they're opening in this current attempt.
     // Adding an event listener for when the widget opens allows us to safely request a new nonce for another session.
     const onOpen = () => {
       this.sendAppParams();
@@ -245,8 +245,12 @@ export class CoinbasePixel {
       }
       this.onReadyCallback?.();
     } else {
+      const error = new Error('Failed to load CB Pay pixel');
+      if (this.debug) {
+        console.error(error);
+      }
       // If no fallback option provided we're in a critical error state
-      this.onReadyCallback?.(new Error('Failed to load CB Pay pixel'));
+      this.onReadyCallback?.(error);
     }
   };
 
