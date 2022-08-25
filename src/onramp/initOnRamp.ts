@@ -25,7 +25,8 @@ export const initOnRamp = (
     },
     onFallbackOpen: () => {
       const url = generateOnRampURL({
-        ...options,
+        appId: options.appId,
+        host: options.host,
         ...widgetParameters,
       });
       window.open(url);
