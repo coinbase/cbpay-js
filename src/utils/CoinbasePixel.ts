@@ -32,7 +32,7 @@ export type CoinbasePixelConstructorParams = {
   host?: string;
   appId: string;
   appParams: JsonObject;
-  onReady?: (error?: Error) => void;
+  onReady: (error?: Error) => void;
   /** Fallback open callback when the pixel failed to load */
   onFallbackOpen?: () => void;
   debug?: boolean;
@@ -54,8 +54,6 @@ export class CoinbasePixel {
    * - waiting_for_response:  Waiting for a post message response.
    */
   private state: 'loading' | 'ready' | 'waiting_for_response' | 'failed' = 'loading';
-  /** A reference to a queued options to open the experience with if pixel isn't ready */
-  private queuedOpenOptions: OpenExperienceOptions | undefined;
   private debug: boolean;
 
   private host: string;
@@ -65,6 +63,7 @@ export class CoinbasePixel {
   private eventStreamListeners: Partial<Record<EventMetadata['eventName'], (() => void)[]>> = {};
   private unsubs: (() => void)[] = [];
   private appParams: JsonObject;
+  /** onReady callback which should be triggered when a nonce has successfully been retrieved */
   private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
   private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
 
@@ -107,7 +106,6 @@ export class CoinbasePixel {
 
     // Still waiting on pixel to load. Queue the options.
     if (this.state === 'loading') {
-      this.queuedOpenOptions = options;
       return;
     }
 
@@ -117,71 +115,85 @@ export class CoinbasePixel {
       return;
     }
 
+    if (!this.nonce) {
+      throw new Error('Attempted to open CB Pay experience without nonce');
+    }
+
+    const nonce = this.nonce;
+    this.nonce = '';
+
     this.setupExperienceListeners(options);
 
-    this.sendAppParams(this.appParams, (nonce) => {
-      const { path, experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
+    const { path, experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
 
-      const widgetUrl = new URL(`${this.host}${path}`);
-      widgetUrl.searchParams.append('appId', this.appId);
-      widgetUrl.searchParams.append('type', 'secure_standalone');
+    const widgetUrl = new URL(`${this.host}${path}`);
+    widgetUrl.searchParams.append('appId', this.appId);
+    widgetUrl.searchParams.append('type', 'secure_standalone');
 
-      const experience = this.isLoggedIn
-        ? experienceLoggedIn
-        : experienceLoggedOut || experienceLoggedIn;
+    const experience = this.isLoggedIn
+      ? experienceLoggedIn
+      : experienceLoggedOut || experienceLoggedIn;
 
-      widgetUrl.searchParams.append('nonce', nonce);
-      const url = widgetUrl.toString();
+    widgetUrl.searchParams.append('nonce', nonce);
+    const url = widgetUrl.toString();
 
-      this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
+    this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
 
-      if (experience === 'embedded') {
-        const openEmbeddedExperience = () => {
-          const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
-          if (embeddedContentStyles?.target) {
-            document.querySelector(embeddedContentStyles?.target)?.replaceChildren(embedded);
-          } else {
-            document.body.appendChild(embedded);
-          }
-        };
-
-        if (!this.isLoggedIn) {
-          // Embedded experience opens popup for signin
-          this.startDirectSignin(openEmbeddedExperience);
+    if (experience === 'embedded') {
+      const openEmbeddedExperience = () => {
+        const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
+        if (embeddedContentStyles?.target) {
+          document.querySelector(embeddedContentStyles?.target)?.replaceChildren(embedded);
         } else {
-          openEmbeddedExperience();
+          document.body.appendChild(embedded);
         }
-      } else if (experience === 'popup' && window.chrome?.windows?.create) {
-        void window.chrome.windows.create(
-          {
-            url,
-            setSelfAsOpener: true,
-            type: 'popup',
-            focused: true,
-            width: PopupSizes.signin.width,
-            height: PopupSizes.signin.height,
-            left: window.screenLeft - PopupSizes.signin.width - 10,
-            top: window.screenTop,
-          },
-          (winRef) => {
-            this.addEventStreamListener('open', () => {
-              if (winRef?.id) {
-                chrome.windows.update(winRef.id, {
-                  width: PopupSizes.widget.width,
-                  height: PopupSizes.widget.height,
-                  left: window.screenLeft - PopupSizes.widget.width - 10,
-                  top: window.screenTop,
-                });
-              }
-            });
-          },
-        );
-      } else if (experience === 'new_tab' && window.chrome?.tabs?.create) {
-        void window.chrome.tabs.create({ url });
+      };
+
+      if (!this.isLoggedIn) {
+        // Embedded experience opens popup for signin
+        this.startDirectSignin(openEmbeddedExperience);
       } else {
-        openWindow(url, experience);
+        openEmbeddedExperience();
       }
-    });
+    } else if (experience === 'popup' && window.chrome?.windows?.create) {
+      void window.chrome.windows.create(
+        {
+          url,
+          setSelfAsOpener: true,
+          type: 'popup',
+          focused: true,
+          width: PopupSizes.signin.width,
+          height: PopupSizes.signin.height,
+          left: window.screenLeft - PopupSizes.signin.width - 10,
+          top: window.screenTop,
+        },
+        (winRef) => {
+          this.addEventStreamListener('open', () => {
+            if (winRef?.id) {
+              chrome.windows.update(winRef.id, {
+                width: PopupSizes.widget.width,
+                height: PopupSizes.widget.height,
+                left: window.screenLeft - PopupSizes.widget.width - 10,
+                top: window.screenTop,
+              });
+            }
+          });
+        },
+      );
+    } else if (experience === 'new_tab' && window.chrome?.tabs?.create) {
+      void window.chrome.tabs.create({ url });
+    } else {
+      openWindow(url, experience);
+    }
+
+    // For users who exit the experience and want to re-enter, we need a fresh nonce to use.
+    // Additionally, if we trigger sendAppParams too early we'll invalidate the nonce they're opening in this current attempt.
+    // Adding an event listener for when the widget opens allows us to safely request a new nonce for another session.
+    const onOpen = () => {
+      this.sendAppParams();
+      this.removeEventStreamListener('open', onOpen);
+    };
+    this.addEventStreamListener('open', onOpen);
   };
 
   public endExperience = (): void => {
@@ -190,7 +202,6 @@ export class CoinbasePixel {
 
   public destroy = (): void => {
     document.getElementById(PIXEL_ID)?.remove();
-    this.queuedOpenOptions = undefined;
     this.unsubs.forEach((unsub) => unsub());
   };
 
@@ -201,15 +212,9 @@ export class CoinbasePixel {
       onMessage: (data) => {
         this.log('Received message: pixel_ready');
         this.isLoggedIn = !!data?.isLoggedIn as boolean;
-        this.onReadyCallback?.();
 
-        // Preload the app parameters immediately
-        this.state = 'waiting_for_response';
-        this.sendAppParams(this.appParams, (nonce) => {
-          this.log('Pixel received app params nonce', nonce);
-          this.state = 'ready';
-          this.nonce = nonce;
-          this.runQueuedOpenExperience();
+        this.sendAppParams(() => {
+          this.onReadyCallback?.();
         });
       },
     });
@@ -231,47 +236,39 @@ export class CoinbasePixel {
 
   /** Failed to load the pixel iframe */
   private onFailedToLoad = () => {
-    const message = 'Failed to load CB Pay pixel. Falling back to opening in new tab.';
     this.state = 'failed';
-    console.warn(message);
-    this.onReadyCallback?.(new Error(message));
-    this.runQueuedOpenExperience();
-  };
 
-  /** Run any queued open experience options. Note: the window.open may not work outside of a click event and fail on browsers like Safari. */
-  private runQueuedOpenExperience = () => {
-    if (this.queuedOpenOptions) {
-      this.log('Running queued experience');
-      const options = { ...this.queuedOpenOptions };
-      this.queuedOpenOptions = undefined;
-      this.openExperience(options);
+    // If a fallback option is provided we only want to provide a warning since we can still attempt to open the widget
+    if (this.onFallbackOpen) {
+      if (this.debug) {
+        console.warn('Failed to load CB Pay pixel. Falling back to opening in new tab.');
+      }
+      this.onReadyCallback?.();
+    } else {
+      const error = new Error('Failed to load CB Pay pixel');
+      if (this.debug) {
+        console.error(error);
+      }
+      // If no fallback option provided we're in a critical error state
+      this.onReadyCallback?.(error);
     }
   };
 
-  private sendAppParams = (appParams: JsonObject, callback?: (nonce: string) => void): void => {
-    // Preloaded nonce already exists.
-    if (this.nonce) {
-      const nonce = this.nonce;
-      this.nonce = '';
-      this.log('Using preloaded nonce', nonce);
-      callback?.(nonce);
-      return;
-    }
-
+  private sendAppParams = (callback?: () => void): void => {
     // Fetch a new nonce from the pixel
     if (this.pixelIframe?.contentWindow) {
       this.log('Sending message: app_params');
       this.onMessage('on_app_params_nonce', {
         onMessage: (data) => {
           this.state = 'ready';
-          const nonce = (data?.nonce as string) || '';
-          callback?.(nonce);
+          this.nonce = (data?.nonce as string) || '';
+          callback?.();
         },
       });
 
       this.state = 'waiting_for_response';
       broadcastPostMessage(this.pixelIframe.contentWindow, 'app_params', {
-        data: appParams,
+        data: this.appParams,
       });
     } else {
       // Shouldn't be here after loading the pixel.
@@ -321,6 +318,13 @@ export class CoinbasePixel {
       this.eventStreamListeners[name]?.push(cb);
     } else {
       this.eventStreamListeners[name] = [cb];
+    }
+  };
+
+  private removeEventStreamListener = (name: EventMetadata['eventName'], callback: () => void) => {
+    if (this.eventStreamListeners[name]) {
+      const filteredListeners = this.eventStreamListeners[name]?.filter((cb) => cb !== callback);
+      this.eventStreamListeners[name] = filteredListeners;
     }
   };
 

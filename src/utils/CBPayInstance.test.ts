@@ -23,6 +23,7 @@ const DEFAULT_ARGS: ConstructorParameters<typeof CBPayInstance>[0] = {
   appId: 'abc123',
   appParams: {},
   widget: 'buy',
+  onReady: jest.fn(),
   experienceLoggedIn: 'popup',
   experienceLoggedOut: 'popup',
 };

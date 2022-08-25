@@ -110,7 +110,7 @@ describe('CoinbasePixel', () => {
 
     expect(instance.isLoggedIn).toEqual(true);
     expect(instance.state).toEqual('waiting_for_response');
-    expect(mockOnReady).toHaveBeenCalledWith();
+    expect(mockOnReady).not.toHaveBeenCalledWith();
   });
 
   it('should handle on_app_params_nonce', () => {
@@ -121,6 +121,8 @@ describe('CoinbasePixel', () => {
 
     expect(instance.nonce).toEqual('mock-nonce');
     expect(instance.state).toEqual('ready');
+    // Important for init callback
+    expect(mockOnReady).toHaveBeenCalledWith();
   });
 
   it('should handle openExperience when pixel is ready', () => {
@@ -140,7 +142,6 @@ describe('CoinbasePixel', () => {
     expect(instance.state).toEqual('loading');
     instance.openExperience(defaultOpenOptions);
 
-    expect(instance.queuedOpenOptions).toBeTruthy();
     expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
   });
 
@@ -169,22 +170,11 @@ describe('CoinbasePixel', () => {
 
     instance.state = 'ready';
     instance.isLoggedIn = true;
-    instance.openExperience(defaultOpenOptions);
+    expect(() => instance.openExperience(defaultOpenOptions)).toThrowError(
+      'Attempted to open CB Pay experience without nonce',
+    );
 
-    expect(instance.state).toEqual('waiting_for_response');
-    mockOnAppParamsNonce('mock-nonce');
-
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
-  });
-
-  it('should handle queued open options', () => {
-    const instance = createUntypedPixel(defaultArgs);
-
-    instance.openExperience(defaultOpenOptions); // trigger queued open
-    mockPixelReady();
-    mockOnAppParamsNonce('mock-nonce');
-
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
+    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
   });
 
   it('should handle opening the embedded experience when logged out', () => {
@@ -278,18 +268,38 @@ describe('CoinbasePixel', () => {
     );
   });
 
-  it('should handle max timeout for ready status', () => {
+  it('should handle max timeout for ready status with no fallback', () => {
+    jest.useFakeTimers();
+    const originalWarn = console.warn;
+    console.warn = jest.fn();
+
+    const instance = createUntypedPixel({
+      ...defaultArgs,
+      onFallbackOpen: undefined, // error path
+    });
+
+    jest.advanceTimersToNextTimer();
+
+    expect(instance.state).toEqual('failed');
+    expect(mockOnReady).toHaveBeenCalledWith(new Error('Failed to load CB Pay pixel'));
+
+    jest.useRealTimers();
+    console.warn = originalWarn;
+  });
+
+  it('should handle max timeout for ready status with fallback', () => {
     jest.useFakeTimers();
     const originalWarn = console.warn;
     console.warn = jest.fn();
 
     const instance = createUntypedPixel(defaultArgs);
 
-    instance.openExperience(defaultOpenOptions); // trigger queued open
     jest.advanceTimersToNextTimer();
 
     expect(instance.state).toEqual('failed');
-    expect(mockOnReady).toHaveBeenCalledWith(expect.any(Error));
+    expect(mockOnReady).toHaveBeenCalledWith();
+
+    instance.openExperience(defaultOpenOptions); // ensure fallback method opens
     expect(mockOnFallbackOpen).toHaveBeenCalled();
 
     jest.useRealTimers();

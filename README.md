@@ -39,18 +39,18 @@ npm install regenerator-runtime
 ```jsx
 import { initOnRamp } from '@coinbase/cbpay-js';
 
-const destinationWallets = [
-  {
-    address: '0xabc123',
-    blockchains: ['ethereum', 'avalanche-c-chain'],
-  },
-];
-
-const instance = initOnRamp({
-  target: '#button-container',
+const options = {
   appId: 'your_app_id',
   widgetParameters: {
-    destinationWallets,
+    destinationWallets: [{
+      address: '0xabc123',
+      blockchains: ['ethereum', 'avalanche-c-chain'],
+    }],
+  },
+  closeOnExit: true,
+  closeOnSuccess: true,
+  embeddedContentStyles: {
+    target: '#target-area',
   },
   onExit: () => {
     alert('On Exit');
@@ -61,28 +61,32 @@ const instance = initOnRamp({
   onEvent: (metadata) => {
     console.log(metadata);
   },
-  closeOnExit: true,
-  closeOnSuccess: true,
-  embeddedContentStyles: {
-    top: '100px',
-    width: '50%',
-  },
+}
+
+// Initialize the CB Pay instance
+let onrampInstance;
+const instance = initOnRamp(options, (error, instance) => {
+  onrampInstance = instance;
 });
 
+// Open the widget when the user clicks a button
+onrampInstance.open();
+
 // When button unmounts destroy the instance
-instance.destroy();
+onrampInstance.destroy();
 ```
 
 ## React example
 
 ```tsx
+import type { CBPayInstanceType, InitOnRampParams } from '@coinbase/cbpay-js';
 import { initOnRamp } from '@coinbase/cbpay-js';
 
 const PayWithCoinbaseButton: React.FC = () => {
-  const onrampInstance = useRef();
+  const [onrampInstance, setOnrampInstance] = useState<CBPayInstanceType | undefined>();
 
   useEffect(() => {
-    onrampInstance.current = initOnRamp({
+    initOnRamp({
       appId: 'your_app_id',
       widgetParameters: {
         destinationWallets: [
@@ -105,18 +109,20 @@ const PayWithCoinbaseButton: React.FC = () => {
       experienceLoggedOut: 'popup',
       closeOnExit: true,
       closeOnSuccess: true,
+    }, (_, instance) => {
+      setOnrampInstance(instance);
     });
 
     return () => {
-      onrampInstance.current?.destroy();
+      onrampInstance?.destroy();
     };
   }, []);
 
   const handleClick = () => {
-    onrampInstance.current?.open();
+    onrampInstance?.open();
   };
 
-  return <Button onClick={handleClick}>Buy with Coinbase</Button>;
+  return <Button onClick={handleClick} disabled={!onrampInstance}>Buy with Coinbase</Button>;
 };
 ```
 
