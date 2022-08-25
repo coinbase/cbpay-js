@@ -1,5 +1,7 @@
 *
+
+# Include
 !dist/**/*
-!docs/**/*
-!src/**/*
-!tsconfig.json
+!CHANGELOG.md
+!LICENSE.md
+!README.md
