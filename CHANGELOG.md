@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2022-08-25
+- Fix invalid CommonJS output.
+- Fix passing generateOnRampURL experience options.
+- Update npm package files.
+- Deprecate onReady parameter.
+- Implement synchronous open function.
+
+### Migration support for initOnRamp
+
+See the updated examples in the README.md. The `onReady` function has been updated to be a callback provided as the second argument in `initOnRamp`. This is to avoid race conditions which results in the widget failing to open in some cases.
+
+
 ## [1.2.0] - 2022-08-19
 - Improve pixel internal state and message management.
 - Implement fallback open functionality for initOnRamp.
