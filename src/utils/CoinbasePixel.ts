@@ -55,6 +55,7 @@ export class CoinbasePixel {
    */
   private state: 'loading' | 'ready' | 'waiting_for_response' | 'failed' = 'loading';
   private debug: boolean;
+  private hasStorageAccess?: boolean;
 
   private host: string;
   private pixelIframe?: HTMLIFrameElement;
@@ -87,6 +88,13 @@ export class CoinbasePixel {
     this.addPixelReadyListener();
     this.embedPixel();
 
+    // Handle browsers where we need to request access before embedding.
+    if ('hasStorageAccess' in document) {
+      document.hasStorageAccess().then((hasAccess) => {
+        this.hasStorageAccess = hasAccess;
+        this.log('hasStorageAccess()', hasAccess);
+      });
+    }
     // Setup a timeout for errors that might stop the window from loading i.e. CSP
     setTimeout(() => {
       if (this.state !== 'ready') {
@@ -152,6 +160,18 @@ export class CoinbasePixel {
       if (!this.isLoggedIn) {
         // Embedded experience opens popup for signin
         this.startDirectSignin(openEmbeddedExperience);
+      } else if (this.hasStorageAccess === false) {
+        // Explicitly check for false as this means the browser API is available and we have a response.
+        // Note that this needs to be called in a click handler but the iframe can
+        // be attached outside of the click context.
+        document
+          .requestStorageAccess()
+          .then(openEmbeddedExperience)
+          .catch((err) => {
+            this.state = 'failed';
+            console.error(err);
+            throw new Error('Error obtaining store access');
+          });
       } else {
         openEmbeddedExperience();
       }
