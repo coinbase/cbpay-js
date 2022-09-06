@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2022-09-06
+- Update exports for core logic.
+
 ## [1.3.0] - 2022-08-25
 - Fix invalid CommonJS output.
 - Fix passing generateOnRampURL experience options.
