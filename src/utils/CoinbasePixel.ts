@@ -63,6 +63,8 @@ export class CoinbasePixel {
   private eventStreamListeners: Partial<Record<EventMetadata['eventName'], (() => void)[]>> = {};
   private unsubs: (() => void)[] = [];
   private appParams: JsonObject;
+  /** This will be called when the pixel successfully initializes to the error listener event. */
+  private removeErrorListener?: () => void;
   /** onReady callback which should be triggered when a nonce has successfully been retrieved */
   private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
   private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
@@ -214,6 +216,7 @@ export class CoinbasePixel {
         this.log('Received message: pixel_ready');
         this.isLoggedIn = !!data?.isLoggedIn as boolean;
 
+        this.removeErrorListener?.();
         this.sendAppParams(() => {
           this.onReadyCallback?.();
         });
@@ -222,14 +225,14 @@ export class CoinbasePixel {
   };
 
   private addErrorListener = (): void => {
-    // TODO - remove this after successful initialization.
-    this.onMessage('error', {
-      shouldUnsubscribe: true, // We only want the user-provided callback to be called once.
+    this.removeErrorListener = this.onMessage('error', {
+      shouldUnsubscribe: true,
       onMessage: (data) => {
         this.log('Received message: error');
 
         if (data) {
-          this.onReadyCallback?.(new Error(JSON.stringify(data)));
+          const message = typeof data === 'string' ? data : JSON.stringify(data);
+          this.onReadyCallback?.(new Error(message));
         }
       },
     });
@@ -344,12 +347,10 @@ export class CoinbasePixel {
   };
 
   private onMessage = (...args: Parameters<typeof onBroadcastedPostMessage>) => {
-    this.unsubs.push(
-      onBroadcastedPostMessage(args[0], {
-        allowedOrigin: this.host,
-        ...args[1],
-      }),
-    );
+    const unsubFxn = onBroadcastedPostMessage(args[0], { allowedOrigin: this.host, ...args[1] });
+    this.unsubs.push(unsubFxn);
+
+    return unsubFxn;
   };
 
   private log = (...args: Parameters<typeof console.log>) => {

@@ -57,7 +57,7 @@ describe('CoinbasePixel', () => {
     expect(instance.pixelIframe).toEqual(expect.any(HTMLIFrameElement));
     expect(instance.nonce).toEqual('');
     expect(instance.onReadyCallback).toEqual(mockOnReady);
-    expect(instance.unsubs.length).toEqual(1);
+    expect(instance.unsubs.length).toEqual(2);
     expect(instance.appParams).toEqual(defaultArgs.appParams);
     expect(instance.state).toEqual('loading');
     expect(instance.isLoggedIn).toEqual(false);
@@ -66,11 +66,21 @@ describe('CoinbasePixel', () => {
   it('should setup pixel ready listener', () => {
     createUntypedPixel(defaultArgs);
 
-    expect(onBroadcastedPostMessage).toHaveBeenCalledTimes(1);
+    expect(onBroadcastedPostMessage).toHaveBeenCalledTimes(2);
     expect(onBroadcastedPostMessage).toHaveBeenCalledWith('pixel_ready', {
       allowedOrigin: 'https://pay.coinbase.com',
       onMessage: expect.any(Function),
       shouldUnsubscribe: false,
+    });
+  });
+
+  it('should setup error listener', () => {
+    createUntypedPixel(defaultArgs);
+
+    expect(onBroadcastedPostMessage).toHaveBeenNthCalledWith(2, 'error', {
+      allowedOrigin: 'https://pay.coinbase.com',
+      onMessage: expect.any(Function),
+      shouldUnsubscribe: true,
     });
   });
 
@@ -82,15 +92,18 @@ describe('CoinbasePixel', () => {
   it('.destroy should remove embedded pixel', () => {
     const pixel = createUntypedPixel(defaultArgs);
     expect(document.querySelector(`iframe#${PIXEL_ID}`)).toBeTruthy();
-
-    mockPixelReady();
-    mockOnAppParamsNonce('mock-nonce');
-
     expect(pixel.unsubs).toHaveLength(2);
+
+    // Firing the `pixel_ready` event will also call the unsubscribe fxn for `addErrorListener()`.
+    mockPixelReady();
+    expect(mockUnsubCallback).toHaveBeenCalledTimes(1); // The 'error' event is unsubscribed.
+
+    mockOnAppParamsNonce('mock-nonce');
+    expect(pixel.unsubs).toHaveLength(3);
 
     pixel.destroy();
     expect(document.querySelector(`iframe#${PIXEL_ID}`)).toBeNull();
-    expect(mockUnsubCallback).toHaveBeenCalledTimes(2);
+    expect(mockUnsubCallback).toHaveBeenCalledTimes(4);
   });
 
   it('should handle pixel_ready message', () => {
@@ -123,6 +136,14 @@ describe('CoinbasePixel', () => {
     expect(instance.state).toEqual('ready');
     // Important for init callback
     expect(mockOnReady).toHaveBeenCalledWith();
+  });
+
+  it('should handle error message', () => {
+    const errorMessage = 'ruh roh';
+    createUntypedPixel(defaultArgs);
+
+    mockBroadcastErrorMessage(errorMessage);
+    expect(mockOnReady).toHaveBeenCalledWith(new Error(errorMessage));
   });
 
   it('should handle openExperience when pixel is ready', () => {
@@ -311,6 +332,14 @@ describe('CoinbasePixel', () => {
 function createUntypedPixel(options: CoinbasePixelConstructorParams) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new CoinbasePixel(options) as any;
+}
+
+function mockBroadcastErrorMessage(message: string) {
+  const onMessageCall = (onBroadcastedPostMessage as jest.Mock).mock.calls.find(
+    ([message]) => message === 'error',
+  );
+  expect(onMessageCall).toBeTruthy();
+  onMessageCall[1].onMessage(message);
 }
 
 function mockPixelReady(isLoggedIn = true) {
