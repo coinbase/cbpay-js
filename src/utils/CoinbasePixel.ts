@@ -85,6 +85,7 @@ export class CoinbasePixel {
     this.debug = debug || false;
 
     this.addPixelReadyListener();
+    this.addErrorListener();
     this.embedPixel();
 
     // Setup a timeout for errors that might stop the window from loading i.e. CSP
@@ -216,6 +217,20 @@ export class CoinbasePixel {
         this.sendAppParams(() => {
           this.onReadyCallback?.();
         });
+      },
+    });
+  };
+
+  private addErrorListener = (): void => {
+    // TODO - remove this after successful initialization.
+    this.onMessage('error', {
+      shouldUnsubscribe: true, // We only want the user-provided callback to be called once.
+      onMessage: (data) => {
+        this.log('Received message: error');
+
+        if (data) {
+          this.onReadyCallback?.(new Error(JSON.stringify(data)));
+        }
       },
     });
   };

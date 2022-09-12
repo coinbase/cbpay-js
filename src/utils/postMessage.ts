@@ -8,6 +8,7 @@ export enum MessageCodes {
   Success = 'success', // TODO: deprecate
   Exit = 'exit', // TODO: deprecate
   Event = 'event',
+  Error = 'error',
 
   PixelReady = 'pixel_ready',
   OnAppParamsNonce = 'on_app_params_nonce',

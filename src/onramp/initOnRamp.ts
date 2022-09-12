@@ -5,7 +5,10 @@ import { generateOnRampURL } from './generateOnRampURL';
 
 export type InitOnRampParams = CBPayExperienceOptions<OnRampAppParams>;
 
-export type InitOnRampCallback = (error: Error | undefined, instance: CBPayInstanceType) => void;
+export type InitOnRampCallback = {
+  (error: Error, instance: null): void;
+  (error: null, instance: CBPayInstanceType): void;
+};
 
 export const initOnRamp = (
   {
@@ -21,7 +24,11 @@ export const initOnRamp = (
     experienceLoggedIn,
     appParams: widgetParameters,
     onReady: (error) => {
-      callback(error, instance);
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, instance);
+      }
     },
     onFallbackOpen: () => {
       const url = generateOnRampURL({
