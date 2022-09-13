@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2022-09-13
+- Move internal exports to main export file.
+
 ## [1.5.0] - 2022-09-13
 - Update package.json exports format.
 - Improvements to pixel error handling.
