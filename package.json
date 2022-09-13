@@ -12,12 +12,6 @@
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./internal": {
-      "types": "./dist/internal.d.ts",
-      "import": "./dist/internal.mjs",
-      "require": "./dist/internal.js",
-      "default": "./dist/internal.js"
-    },
     "./package.json": "./package.json"
   },
   "files": [
