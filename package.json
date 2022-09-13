@@ -6,22 +6,18 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": [
-      {
-        "import": "./dist/index.mjs",
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "./dist/index.js"
-    ],
-    "./internal": [
-      {
-        "import": "./dist/internal.mjs",
-        "types": "./dist/internal.d.ts",
-        "default": "./dist/internal.js"
-      },
-      "./dist/internal.js"
-    ],
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.mjs",
+      "require": "./dist/internal.js",
+      "default": "./dist/internal.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
