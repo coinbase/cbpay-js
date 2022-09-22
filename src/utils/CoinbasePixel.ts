@@ -93,7 +93,7 @@ export class CoinbasePixel {
     // Setup a timeout for errors that might stop the window from loading i.e. CSP
     setTimeout(() => {
       if (this.state !== 'ready') {
-        this.onFailedToLoad();
+        this.onFailedToLoad('timeout');
       }
     }, DEFAULT_MAX_LOAD_TIMEOUT);
   }
@@ -246,14 +246,14 @@ export class CoinbasePixel {
       appId: this.appId,
     });
 
-    pixel.onerror = this.onFailedToLoad;
+    pixel.onerror = () => this.onFailedToLoad;
 
     this.pixelIframe = pixel;
     document.body.appendChild(pixel);
   };
 
   /** Failed to load the pixel iframe */
-  private onFailedToLoad = () => {
+  private onFailedToLoad = (reason?: string) => {
     this.state = 'failed';
 
     // If a fallback option is provided we only want to provide a warning since we can still attempt to open the widget
@@ -263,7 +263,12 @@ export class CoinbasePixel {
       }
       this.onReadyCallback?.();
     } else {
-      const error = new Error('Failed to load CB Pay pixel');
+      let message = 'Failed to load CB Pay pixel';
+      if (reason) {
+        message += ` with reason: ${reason}`;
+      }
+
+      const error = new Error(message);
       if (this.debug) {
         console.error(error);
       }
