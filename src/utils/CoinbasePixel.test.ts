@@ -302,7 +302,9 @@ describe('CoinbasePixel', () => {
     jest.advanceTimersToNextTimer();
 
     expect(instance.state).toEqual('failed');
-    expect(mockOnReady).toHaveBeenCalledWith(new Error('Failed to load CB Pay pixel'));
+    expect(mockOnReady).toHaveBeenCalledWith(
+      new Error('Failed to load CB Pay pixel with reason: timeout'),
+    );
 
     jest.useRealTimers();
     console.warn = originalWarn;
