@@ -1,0 +1,260 @@
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.4.11-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 89668
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.4.11-1_ppc64el.deb
+Size: 16468058
+MD5sum: d42d212d3d4dae577cd9d9a08a55110b
+SHA1: 7606f2dee712dca012bccd3ff76f92f5e9aca908
+SHA256: cc46b9d372c5742d0cc0680a9114ed1f4dac31fedcb2228b8ca3c0a7afe61500
+SHA512: 3203be618de31ee314cb5d935757a63af5ba7389ad1b8be3750c8993416f805c86ba02dd5db9399ff2359d6e6ad499870413d434a34cf34aeab21aedd422378b
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.4.12-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 89732
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.4.12-1_ppc64el.deb
+Size: 16476954
+MD5sum: adb9a5c7cbbf982e115e21ef47bb82fa
+SHA1: abc86729305b6f4e489e2875a9c93e0d945577e7
+SHA256: e6e129dbd96293242b908bc6096add5ec9278c8983491d8043cd97835996ac8c
+SHA512: 84d8736c00289c16e04e7fbe1341859c6022ace635d8ce630c16e7724aa6eca077144911b7ba74e5b37f703966b3e826763d8379a1f14d66f88dd60c3f06655c
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.4.13-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 89860
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.4.13-1_ppc64el.deb
+Size: 16473662
+MD5sum: 140bf3fa345b565ce1aae133b4959d2e
+SHA1: 0c3bb77bbaf8f2e7af6af28be6d85b87dd91240b
+SHA256: 3a89229deb45b93bb222c999d21c54f4b4d9c090afa5389ac5766cc480b64f53
+SHA512: 08c8788b9107c43ae1d6351c2759861f24bfe514ac25e53440c7b1e0d743b007a9a04cc9031b1af9b5902ce91139638458d23ccf3633b91c7d683cfe99886fae
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.4.6-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 92688
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.4.6-1_ppc64el.deb
+Size: 17872238
+MD5sum: 2e81c481855547d291feb7da7a74ffbf
+SHA1: 311a6240156bdc75454768de59675c0884b3a84e
+SHA256: de66eae60f60f2e090bf591f5f74cdce0cb1ee84cf4308f3ef0ecd02105974b3
+SHA512: 2b1a1860de80f50c0592cbdfa4b4a59cb7547738b37e3f66074ad5436e34abf2cffa9b746ae7305fed959e80ff1b20d35fbd81f88938082bf8e54eb72e5f67a5
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.4.9-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 93209
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.4.9-1_ppc64el.deb
+Size: 17943138
+MD5sum: 1204dfd8cbac58814fe794c8c2ad0e4b
+SHA1: 11163cdc213be4a618196f1e3834317ef8181df0
+SHA256: 0acf62291d37df0b2e252a1cab001669d2ece83068e1143b752aa151b813813c
+SHA512: 34a42dc9c491bff7bbeaa2eec77d1cebba972f0dc50aae961f5e8ac5d3a1c288d18f8a36a00804b63556909196b18b2b78ac6ee01a4a84078243d9f9df5cf37e
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.5.10-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 91419
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.5.10-1_ppc64el.deb
+Size: 17144054
+MD5sum: 93850f1964d1e4ef39ad7ab659200207
+SHA1: 599533b3bf67f7a622352b4ca1d785e449f94678
+SHA256: e4dc49d868de562cc03212fc913635e5c8c58d045009abd82082e9d1b056d1d9
+SHA512: dddd1696fcbdbd0b2e6bb1b64fb0787f3bc10ff921b3959566ce4460105e59bc4fdfc74e4481c20f51912d39e73187e311fc59d79cfa13f8ef5dddfa04460ab3
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.5.11-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 93329
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.4.1)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.5.11-1_ppc64el.deb
+Size: 16648022
+MD5sum: be0fc9bc82d1d822f41f1eeabc4cc54e
+SHA1: 65d0b1424454e5de2d908b84c6e457e7a97a94fc
+SHA256: 2c057b42468df36277ddaaebdd9bb0866613d6ca098bb36cd233fdf76aefdfe4
+SHA512: 89a18ea1f4022e35adc7e2c470ca76457a62434e4a29bb02462c84ca2f18d6687c2c851348af0f6ceed9ea365a1908a970a757aa8224462d292ef00fe41a6522
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.6.10-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 92927
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.5.0)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.6.10-1_ppc64el.deb
+Size: 19389814
+MD5sum: 42567abcb3dd7da1d83b2930238a36c2
+SHA1: 8fada2f82153467b2a0f3105f25e7cc00f75376b
+SHA256: 88c82dee30098f1ebdd9fc0acc8c866f3b9bc39430abb812b438dcbd77e54472
+SHA512: 04eb262ca2429b6e4999e4fa0450674b0d9fadcae9e082e83088220036da50bde5f2814643488bb28f59f268cda5ea058569600fc47500327ad45a07459a2fad
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.6.4-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 107236
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.5.0)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.6.4-1_ppc64el.deb
+Size: 19990506
+MD5sum: 9193d46b5b7de094b9d6c1a5756f0c23
+SHA1: e3348cdee7ed0bd902ce4eac745d4855fd94f8ba
+SHA256: d74ff2ff80a99c3e654160f1e38eefb8e72549139be3e0ccb9c19095693e094b
+SHA512: e822a75c60b57b4032fd4576022681b9261ff03c06de8bb1cb33fc4e7ba6ffa1e48574f1239a1c7d1d376fa15fc3fddf6af912dbe8a7340b5c82e8a1996045c0
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.6.6-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 107236
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.5.0)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.6.6-1_ppc64el.deb
+Size: 20007338
+MD5sum: c08a65f6dab28e9d8a4179ac85fa707c
+SHA1: 34e8e1c7d92f30051a496b5fdbce16833e8c3b66
+SHA256: 33412fbdafb9a7e8f421cb5ce443be3354c0f6ece8751c5dccdb50e3f2423748
+SHA512: bd36e50d867591270606c4eec6b6c791586c1e6a37905f65f2aa0c5d5325d747f4de69973915a36df74286a67957a7e7fa921c07ff4840ba5e4c1ca2fbff7197
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.6.7-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 107300
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.5.0)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.6.7-1_ppc64el.deb
+Size: 20037778
+MD5sum: d32bfe78545500a0f27f12277c4093e8
+SHA1: 37a8783b25c3c4bbde32f240d795bd32da87ec51
+SHA256: 94e1ed68c550e33c523d7ca590cdbfeb26bd992ded0c48ee32590be38237ce13
+SHA512: 42ad32f62a6dcd39108557f1192bc15ca7b894c7f81de9b7b5d96e2eb8bbba8b0d89ba1d03f8c30a215632c4ceffd237bcfd6831ffa36cd9c79a7991524359fb
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.6.8-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 107300
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.5.0)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.6.8-1_ppc64el.deb
+Size: 20056242
+MD5sum: 049190e8daa6020c82d5ca9c3088bb13
+SHA1: 1cb6b75701355fdab3fbb02e5ef3a2def24a193d
+SHA256: b0c5330cc5b88e374a05052ade1a49344db171c5ce585179ebade1d1b7148c18
+SHA512: 4fb4b547da2032f19653d3d78b015fc317934011808890ea808ed4b714f9a01899c15f8d97ae16321f3988266b21975563d3a1b22a322e02b910e67ab24d4a92
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
+Package: containerd.io
+Architecture: ppc64el
+Version: 1.6.9-1
+Priority: optional
+Section: devel
+Maintainer: Containerd team <help@containerd.io>
+Installed-Size: 92929
+Provides: containerd, runc
+Depends: libc6 (>= 2.17), libseccomp2 (>= 2.5.0)
+Conflicts: containerd, runc
+Replaces: containerd, runc
+Filename: dists/bullseye/pool/nightly/ppc64el/containerd.io_1.6.9-1_ppc64el.deb
+Size: 19384714
+MD5sum: fc7f1f569c0e97e6069bb59b9d5ff8b4
+SHA1: bcc5ead23739958e69cdc47d31470a53414c28c5
+SHA256: fb88721c724eb7783238f932be6584ff13f6f5590a14cb84391f61b98a08d0e5
+SHA512: 35f1763ee51a0b79fc98dcdc635aedbc44e96019131df8a9c93792f47d1910190bbae5d8863390892eda1b97b81a985064fcdda67e29f58c723fa3a5c12529d2
+Homepage: https://containerd.io
+Description: An open and reliable container runtime
+
