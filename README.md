@@ -126,6 +126,50 @@ const PayWithCoinbaseButton: React.FC = () => {
 };
 ```
 
+## React-Native example
+
+### Prerequisites
+
+``` 
+yarn add react-native-url-polyfill/auto
+```
+
+```tsx
+import React, { useMemo } from 'react'
+import { WebView } from 'react-native-webview'
+import { generateOnRampURL } from '@coinbase/cbpay-js'
+import 'react-native-url-polyfill/auto'
+
+const CoinbaseWebView = () => {
+  const coinbaseURL = useMemo(() => {
+    const options = {
+      appId: 'your_app_id',
+      destinationWallets: [
+        {
+          address: '0xe10',
+          blockchains: ['solana', 'ethereum'],
+        },
+      ],
+      presetCryptoAmount: 100,
+      presetFiatAmount: 100,
+    }
+
+    return generateOnRampURL(options)
+  }, [currentAccount])
+
+  const onMessage = useCallback((event) => {
+    // Check for Success and Error Messages here
+    console.log('onMessage', event.nativeEvent.data)
+  }, [])
+
+  return (
+    <WebView source={{ uri: coinbaseURL || '' }} onMessage={onMessage} />
+  )
+}
+
+export default CoinbaseWebView
+```
+
 ## Contributing
 
 Commit signing is required for contributing to this repo. For details, see the docs on [contributing](./CONTRIBUTING.md) and [commit-signing](./docs/commit-signing.md).
