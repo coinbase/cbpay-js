@@ -1,6 +1,7 @@
 export type SupportedBlockchains =
   | 'algorand'
   | 'aptos'
+  | 'arbitrum'
   | 'avalanche-c-chain'
   | 'bitcoin'
   | 'bitcoin-cash'
@@ -8,6 +9,7 @@ export type SupportedBlockchains =
   | 'celo'
   | 'cosmos'
   | 'dash'
+  | 'deso'
   | 'dfinity'
   | 'dogecoin'
   | 'elrond'
@@ -19,10 +21,16 @@ export type SupportedBlockchains =
   | 'hedera'
   | 'horizen'
   | 'kava'
+  | 'kusama'
   | 'litecoin'
+  | 'mina'
+  | 'near-protocol'
+  | 'oasis'
   | 'optimism'
   | 'polkadot'
+  | 'polygon'
   | 'solana'
+  | 'stacks'
   | 'stellar'
   | 'tezos'
   | 'zcash';
@@ -38,6 +46,8 @@ export type DestinationWallet = {
   supportedNetworks?: string[];
 };
 
+export type OnRampExperience = 'buy' | 'send';
+
 export type OnRampAppParams = {
   /** The destination wallets supported by your application (BTC, ETH, etc). */
   destinationWallets: DestinationWallet[];
@@ -51,4 +61,6 @@ export type OnRampAppParams = {
   presetFiatAmount?: number;
   /** The default network that should be selected when multiple networks are present. */
   defaultNetwork?: string;
+  /** The default experience the user should see: either transfer funds from Coinbase (`'send'`) or buy them (`'buy'`). */
+  defaultExperience?: OnRampExperience;
 };
