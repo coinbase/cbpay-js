@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2022-09-13
+- Expose new `defaultExperience` parameter.
+
 ## [1.6.0] - 2022-09-13
 - Move internal exports to main export file.
 
