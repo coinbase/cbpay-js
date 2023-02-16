@@ -3,6 +3,7 @@ export type SupportedBlockchains =
   | 'aptos'
   | 'arbitrum'
   | 'avalanche-c-chain'
+  | 'axelar'
   | 'bitcoin'
   | 'bitcoin-cash'
   | 'cardano'
