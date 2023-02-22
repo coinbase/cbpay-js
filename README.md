@@ -131,7 +131,7 @@ const PayWithCoinbaseButton: React.FC = () => {
 ### Prerequisites
 
 ``` 
-yarn add react-native-url-polyfill/auto
+yarn add react-native-url-polyfill
 ```
 
 ```tsx
