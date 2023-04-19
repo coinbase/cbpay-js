@@ -4,6 +4,7 @@ import { OnRampAppParams } from '../types/onramp';
 export type GenerateOnRampURLOptions = {
   appId: string;
   host?: string;
+  handlingRequestedUrls?: boolean;
 } & OnRampAppParams;
 
 export const generateOnRampURL = ({
