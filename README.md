@@ -140,30 +140,38 @@ import { WebView } from 'react-native-webview'
 import { generateOnRampURL } from '@coinbase/cbpay-js'
 import 'react-native-url-polyfill/auto'
 
-const CoinbaseWebView = () => {
+const CoinbaseWebView = ({ currentAmount }) => {
   const coinbaseURL = useMemo(() => {
     const options = {
       appId: 'your_app_id',
       destinationWallets: [
         {
-          address: '0xe10',
+          address: destinationAddress,
           blockchains: ['solana', 'ethereum'],
         },
       ],
-      presetCryptoAmount: 100,
-      presetFiatAmount: 100,
+      handlingRequestedUrls: true,
+      presetCryptoAmount: currentAmount,
     }
 
     return generateOnRampURL(options)
-  }, [currentAccount])
+  }, [currentAmount, destinationAddress])
 
   const onMessage = useCallback((event) => {
     // Check for Success and Error Messages here
     console.log('onMessage', event.nativeEvent.data)
+    try {
+      const { data } = JSON.parse(event.nativeEvent.data);
+      if (data.eventName === 'request_open_url') {
+        viewUrlInSecondWebview(data.url);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }, [])
 
   return (
-    <WebView source={{ uri: coinbaseURL || '' }} onMessage={onMessage} />
+    <WebView source={{ uri: coinbaseURL }} onMessage={onMessage} />
   )
 }
 
