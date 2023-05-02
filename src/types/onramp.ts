@@ -64,4 +64,5 @@ export type OnRampAppParams = {
   defaultNetwork?: string;
   /** The default experience the user should see: either transfer funds from Coinbase (`'send'`) or buy them (`'buy'`). */
   defaultExperience?: OnRampExperience;
+  handlingRequestedUrls?: boolean;
 };
