@@ -23,6 +23,7 @@ export type CBPayExperienceOptions<T> = {
   onExit?: (error?: Error) => void;
   onSuccess?: () => void;
   onEvent?: (event: EventMetadata) => void;
+  onRequestedUrl?: (url: string) => void;
   closeOnExit?: boolean;
   closeOnSuccess?: boolean;
   embeddedContentStyles?: EmbeddedContentStyles;
