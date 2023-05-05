@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2023-05-05
+- Add `defaultExperience` parameter
+- Add `handlingRequestedUrls` parameter and associated `request_open_url` event
+- Add support for several blockchains
+
 ## [1.6.0] - 2022-09-13
 - Move internal exports to main export file.
 
