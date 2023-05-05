@@ -18,6 +18,7 @@ export type SupportedBlockchains =
   | 'ethereum'
   | 'ethereum-classic'
   | 'filecoin'
+  | 'flare'
   | 'flow'
   | 'hedera'
   | 'horizen'
