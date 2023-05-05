@@ -26,6 +26,7 @@ export type ExperienceListeners = {
   onExit?: (data?: JsonObject) => void;
   onSuccess?: (data?: JsonObject) => void;
   onEvent?: (event: EventMetadata) => void;
+  onRequestedUrl?: (url: string) => void;
 };
 
 export type CoinbasePixelConstructorParams = {
@@ -297,7 +298,12 @@ export class CoinbasePixel {
     }
   };
 
-  private setupExperienceListeners = ({ onSuccess, onExit, onEvent }: ExperienceListeners) => {
+  private setupExperienceListeners = ({
+    onSuccess,
+    onExit,
+    onEvent,
+    onRequestedUrl,
+  }: ExperienceListeners) => {
     this.onMessage('event', {
       shouldUnsubscribe: false,
       onMessage: (data) => {
@@ -310,6 +316,9 @@ export class CoinbasePixel {
         }
         if (metadata.eventName === 'exit') {
           onExit?.(metadata.error);
+        }
+        if (metadata.eventName === 'request_open_url') {
+          onRequestedUrl?.(metadata.url);
         }
         onEvent?.(data as EventMetadata);
       },
