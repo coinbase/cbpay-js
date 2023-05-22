@@ -34,6 +34,7 @@ export type SupportedBlockchains =
   | 'solana'
   | 'stacks'
   | 'stellar'
+  | 'sui'
   | 'tezos'
   | 'zcash';
 
