@@ -8,7 +8,7 @@ import { EventMetadata } from 'types/events';
 const PIXEL_PATH = '/embed';
 
 /** Default time to wait before setting loading to "failed" state */
-const DEFAULT_MAX_LOAD_TIMEOUT = 50000;
+const DEFAULT_MAX_LOAD_TIMEOUT = 5000;
 export const PIXEL_ID = 'coinbase-sdk-connect';
 
 const PopupSizes: Record<'signin' | 'widget', { width: number; height: number }> = {
@@ -94,8 +94,7 @@ export class CoinbasePixel {
     // Setup a timeout for errors that might stop the window from loading i.e. CSP
     setTimeout(() => {
       if (this.state !== 'ready') {
-        console.log("Timeout, would fallback.")
-        //this.onFailedToLoad();
+        this.onFailedToLoad();
       }
     }, DEFAULT_MAX_LOAD_TIMEOUT);
   }
@@ -116,7 +115,6 @@ export class CoinbasePixel {
 
     // Pixel failed to load or ran into a critical error, run fallback if provided.
     if (this.state === 'failed') {
-      console.log("Embed failed.");
       this.onFallbackOpen?.();
       return;
     }
@@ -382,14 +380,12 @@ function createPixel({ host, appId }: { host: string; appId: string }) {
 
   const url = new URL(`${host}${PIXEL_PATH}`);
   url.searchParams.append('appId', appId);
-  console.log("Pixel URL: ", url.toString());
   pixel.src = url.toString();
 
   return pixel;
 }
 
 function openWindow(url: string, experience: Experience) {
-  console.log("Trying to open window in new tab.");
   return window.open(
     url,
     'Coinbase',

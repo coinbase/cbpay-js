@@ -31,7 +31,6 @@ export const initOnRamp = (
       }
     },
     onFallbackOpen: () => {
-      console.log("Falling back to onramp URL: ", options, widgetParameters);
       const url = generateOnRampURL({
         appId: options.appId,
         host: options.host,
