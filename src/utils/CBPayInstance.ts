@@ -56,6 +56,7 @@ export class CBPayInstance implements CBPayInstanceType {
       onExit,
       onSuccess,
       onEvent,
+      onRequestedUrl,
       closeOnSuccess,
       closeOnExit,
     } = this.options;
@@ -77,6 +78,7 @@ export class CBPayInstance implements CBPayInstanceType {
           this.pixel.endExperience();
         }
       },
+      onRequestedUrl,
       onEvent,
     });
   };

@@ -26,9 +26,15 @@ export type SuccessEvent = {
   eventName: 'success';
 };
 
+export type RequestOpenUrlEvent = {
+  eventName: 'request_open_url';
+  url: string;
+};
+
 export type EventMetadata =
   | OpenEvent
   | TransitionViewEvent
   | PublicErrorEvent
   | ExitEvent
-  | SuccessEvent;
+  | SuccessEvent
+  | RequestOpenUrlEvent;
