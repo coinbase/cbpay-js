@@ -11,7 +11,7 @@ export type DestinationWallet = {
 
 export type OnRampExperience = 'buy' | 'send';
 
-export type OnRampAppParams = {
+type BaseOnRampAppParams = {
   /** The destination wallets supported by your application (BTC, ETH, etc). */
   destinationWallets: DestinationWallet[];
   /** The preset input amount as a crypto value. i.e. 0.1 ETH. This will be the initial default for all cryptocurrencies. */
@@ -28,3 +28,14 @@ export type OnRampAppParams = {
   defaultExperience?: OnRampExperience;
   handlingRequestedUrls?: boolean;
 };
+
+export type OnRampAggregatorAppParams = {
+  quoteId: string;
+  defaultAsset: string;
+  defaultNetwork?: string;
+  defaultPaymentMethod: string;
+  presetFiatAmount: number;
+  fiatCurrency: string;
+}
+
+export type OnRampAppParams = BaseOnRampAppParams | (BaseOnRampAppParams & OnRampAggregatorAppParams)
