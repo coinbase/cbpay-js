@@ -36,6 +36,8 @@ export type OnRampAggregatorAppParams = {
   defaultPaymentMethod: string;
   presetFiatAmount: number;
   fiatCurrency: string;
-}
+};
 
-export type OnRampAppParams = BaseOnRampAppParams | (BaseOnRampAppParams & OnRampAggregatorAppParams)
+export type OnRampAppParams =
+  | BaseOnRampAppParams
+  | (BaseOnRampAppParams & OnRampAggregatorAppParams);
