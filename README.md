@@ -201,7 +201,7 @@ const PayWithCoinbaseButton: React.FC = () => {
         // defaultNetwork is the exception - it's optional.
         quoteId: 'quote_id_from_buy_quote_api',
         defaultAsset: 'asset_uuid_from_buy_options_api',
-        defaultNetwork 'network_name_from_buy_options_api',
+        defaultNetwork: 'network_name_from_buy_options_api',
         defaultPaymentMethod: 'payment_method_from_buy_options_api',
         presetFiatAmount: 50,
         fiatCurrency: 'payment_currency_from_buy_options_api',
