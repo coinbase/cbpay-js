@@ -27,6 +27,8 @@ type BaseOnRampAppParams = {
   /** The default experience the user should see: either transfer funds from Coinbase (`'send'`) or buy them (`'buy'`). */
   defaultExperience?: OnRampExperience;
   handlingRequestedUrls?: boolean;
+  /** ID used to link all user transactions created during the session. */
+  partnerUserId?: string;
 };
 
 export type OnRampAggregatorAppParams = {
