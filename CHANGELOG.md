@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.10.0] - 2024-01-11
+- Add `onrampToken` parameter
+
 ## [1.9.0] - 2023-11-07
 - Add `partnerUserId` parameter
 
