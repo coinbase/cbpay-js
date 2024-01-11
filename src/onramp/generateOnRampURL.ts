@@ -21,7 +21,6 @@ export const generateOnRampURL = ({
   if (destinationWallets !== undefined) {
     url.searchParams.append('destinationWallets', JSON.stringify(destinationWallets));
   }
-  
   (Object.keys(otherParams) as (keyof typeof otherParams)[]).forEach((key) => {
     const value = otherParams[key];
     if (value !== undefined) {
