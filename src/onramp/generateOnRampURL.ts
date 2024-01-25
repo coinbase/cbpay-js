@@ -2,12 +2,12 @@ import { DEFAULT_HOST } from '../config';
 import { OnRampAppParams } from '../types/onramp';
 
 export type GenerateOnRampURLOptions = {
-  /** This & destinationWallets or onrampToken are required. */
+  /** This & destinationWallets or sessionToken are required. */
   appId?: string;
   destinationWallets?: OnRampAppParams['destinationWallets'];
   host?: string;
   /** This or appId & destinationWallets are required. */
-  onrampToken?: string;
+  sessionToken?: string;
 } & Omit<OnRampAppParams, 'destinationWallets'>;
 
 export const generateOnRampURL = ({

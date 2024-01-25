@@ -15,15 +15,15 @@ describe('generateOnrampURL', () => {
     expect(url.searchParams.get('appId')).toEqual('test');
   });
 
-  it('should support onrampToken', () => {
+  it('should support sessionToken', () => {
     const url = new URL(
       generateOnRampURL({
-        onrampToken: 'test',
+        sessionToken: 'test',
       }),
     );
     expect(url.origin).toEqual('https://pay.coinbase.com');
     expect(url.pathname).toEqual('/buy/select-asset');
-    expect(url.searchParams.get('onrampToken')).toEqual('test');
+    expect(url.searchParams.get('sessionToken')).toEqual('test');
   });
 
   it('generates URL with empty destination wallets', () => {
