@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2024-01-25
+- [BREAKING CHANGE] Rename `onrampToken` parameter to `sessionToken`
+
 ## [1.10.0] - 2024-01-11
 - Add `onrampToken` parameter
 
