@@ -65,7 +65,7 @@ const options = {
 
 // Initialize the CB Pay instance
 let onrampInstance;
-const instance = initOnRamp(options, (error, instance) => {
+initOnRamp(options, (error, instance) => {
   onrampInstance = instance;
 });
 
