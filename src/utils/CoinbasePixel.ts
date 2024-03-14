@@ -1,5 +1,5 @@
 import { DEFAULT_HOST } from '../config';
-import { EmbeddedContentStyles, Experience } from 'types/widget';
+import { EmbeddedContentStyles, Experience, Theme } from 'types/widget';
 import { createEmbeddedContent, EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
 import { JsonObject } from 'types/JsonTypes';
 import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
@@ -37,6 +37,7 @@ export type CoinbasePixelConstructorParams = {
   /** Fallback open callback when the pixel failed to load */
   onFallbackOpen?: () => void;
   debug?: boolean;
+  theme?: Theme;
 };
 
 export type OpenExperienceOptions = {
@@ -69,6 +70,7 @@ export class CoinbasePixel {
   /** onReady callback which should be triggered when a nonce has successfully been retrieved */
   private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
   private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
+  private theme: Theme | null | undefined;
 
   public isLoggedIn = false;
 
@@ -79,6 +81,7 @@ export class CoinbasePixel {
     onReady,
     onFallbackOpen,
     debug,
+    theme,
   }: CoinbasePixelConstructorParams) {
     this.host = host;
     this.appId = appId;
@@ -86,6 +89,7 @@ export class CoinbasePixel {
     this.onReadyCallback = onReady;
     this.onFallbackOpen = onFallbackOpen;
     this.debug = debug || false;
+    this.theme = theme;
 
     this.addPixelReadyListener();
     this.addErrorListener();
@@ -133,6 +137,10 @@ export class CoinbasePixel {
     const widgetUrl = new URL(`${this.host}${path}`);
     widgetUrl.searchParams.append('appId', this.appId);
     widgetUrl.searchParams.append('type', 'secure_standalone');
+
+    if (this.theme) {
+      widgetUrl.searchParams.append('theme', this.theme);
+    }
 
     const experience = this.isLoggedIn
       ? experienceLoggedIn
