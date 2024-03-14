@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.0.1] - 2024-03-14
+## [2.1.0] - 2024-03-14
 - Add `theme` parameter
 
 ## [2.0.0] - 2024-01-25
