@@ -6,6 +6,8 @@ export type IntegrationType = 'direct' | 'secure_standalone';
 
 export type Experience = 'embedded' | 'popup' | 'new_tab';
 
+export type Theme = 'light' | 'dark';
+
 export type EmbeddedContentStyles = {
   target?: string;
   width?: string;
@@ -20,6 +22,7 @@ export type CBPayExperienceOptions<T> = {
   appId: string;
   host?: string;
   debug?: boolean;
+  theme?: Theme;
   onExit?: (error?: Error) => void;
   onSuccess?: () => void;
   onEvent?: (event: EventMetadata) => void;

@@ -1,5 +1,6 @@
 import { DEFAULT_HOST } from '../config';
 import { OnRampAppParams } from '../types/onramp';
+import type { Theme } from '../types/widget';
 
 export type GenerateOnRampURLOptions = {
   /** This & destinationWallets or sessionToken are required. */
@@ -8,6 +9,7 @@ export type GenerateOnRampURLOptions = {
   host?: string;
   /** This or appId & destinationWallets are required. */
   sessionToken?: string;
+  theme?: Theme;
 } & Omit<OnRampAppParams, 'destinationWallets'>;
 
 export const generateOnRampURL = ({
