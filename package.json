@@ -18,7 +18,9 @@
     "dist",
     "CHANGELOG.md",
     "LICENSE.md",
-    "README.md"
+    "README.md",
+    "Myproject",
+    "Myapp"
   ],
   "scripts": {
     "build": "tsup",
