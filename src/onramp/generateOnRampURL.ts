@@ -1,10 +1,16 @@
 import { DEFAULT_HOST } from '../config';
 import { OnRampAppParams } from '../types/onramp';
+import type { Theme } from '../types/widget';
 
 export type GenerateOnRampURLOptions = {
-  appId: string;
+  /** This & destinationWallets or sessionToken are required. */
+  appId?: string;
+  destinationWallets?: OnRampAppParams['destinationWallets'];
   host?: string;
-} & OnRampAppParams;
+  /** This or appId & destinationWallets are required. */
+  sessionToken?: string;
+  theme?: Theme;
+} & Omit<OnRampAppParams, 'destinationWallets'>;
 
 export const generateOnRampURL = ({
   host = DEFAULT_HOST,
@@ -14,8 +20,9 @@ export const generateOnRampURL = ({
   const url = new URL(host);
   url.pathname = '/buy/select-asset';
 
-  url.searchParams.append('destinationWallets', JSON.stringify(destinationWallets));
-
+  if (destinationWallets !== undefined) {
+    url.searchParams.append('destinationWallets', JSON.stringify(destinationWallets));
+  }
   (Object.keys(otherParams) as (keyof typeof otherParams)[]).forEach((key) => {
     const value = otherParams[key];
     if (value !== undefined) {

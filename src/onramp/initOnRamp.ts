@@ -34,6 +34,7 @@ export const initOnRamp = (
       const url = generateOnRampURL({
         appId: options.appId,
         host: options.host,
+        theme: options.theme,
         ...widgetParameters,
       });
       window.open(url);

@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2024-03-14
+- Add `theme` parameter
+
+## [2.0.0] - 2024-01-25
+- [BREAKING CHANGE] Rename `onrampToken` parameter to `sessionToken`
+
+## [1.10.0] - 2024-01-11
+- Add `onrampToken` parameter
+
+## [1.9.0] - 2023-11-07
+- Add `partnerUserId` parameter
+
+## [1.8.0] - 2023-10-12
+- Add support for Aggregator API parameters
+- Remove old SupportedBlockchains type
+  - Hard coding this list into the SDK wasn't ideal
+  - We support the expected set of assets + networks
+  - We're adding an endpoint which lists the currently supported assets + networks.
+
 ## [1.7.0] - 2023-05-05
 - Add `defaultExperience` parameter
 - Add `handlingRequestedUrls` parameter and associated `request_open_url` event

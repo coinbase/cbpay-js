@@ -65,7 +65,7 @@ const options = {
 
 // Initialize the CB Pay instance
 let onrampInstance;
-const instance = initOnRamp(options, (error, instance) => {
+initOnRamp(options, (error, instance) => {
   onrampInstance = instance;
 });
 
@@ -177,6 +177,65 @@ const CoinbaseWebView = ({ currentAmount }) => {
 
 export default CoinbaseWebView
 ```
+
+## Aggregator Example
+Review the [Coinbase Cloud docs](https://docs.cloud.coinbase.com/pay-sdk/) for how to produce the parameters for use within an on ramp aggregator.
+```tsx
+import type { CBPayInstanceType, InitOnRampParams } from '@coinbase/cbpay-js';
+import { initOnRamp } from '@coinbase/cbpay-js';
+
+const PayWithCoinbaseButton: React.FC = () => {
+  const [onrampInstance, setOnrampInstance] = useState<CBPayInstanceType | undefined>();
+
+  useEffect(() => {
+    initOnRamp({
+      appId: 'your_app_id',
+      widgetParameters: {
+        destinationWallets: [
+          {
+            address: '0xabc123',
+            blockchains: ['ethereum', 'avalanche-c-chain'],
+          },
+        ],
+        // Aggregator params are ignored unless they are all provided.
+        // defaultNetwork is the exception - it's optional.
+        quoteId: 'quote_id_from_buy_quote_api',
+        defaultAsset: 'asset_uuid_from_buy_options_api',
+        defaultNetwork: 'network_name_from_buy_options_api',
+        defaultPaymentMethod: 'payment_method_from_buy_options_api',
+        presetFiatAmount: 50,
+        fiatCurrency: 'payment_currency_from_buy_options_api',
+      },
+      onSuccess: () => {
+        console.log('success');
+      },
+      onExit: () => {
+        console.log('exit');
+      },
+      onEvent: (event) => {
+        console.log('event', event);
+      },
+      experienceLoggedIn: 'popup',
+      experienceLoggedOut: 'popup',
+      closeOnExit: true,
+      closeOnSuccess: true,
+    }, (_, instance) => {
+      setOnrampInstance(instance);
+    });
+
+    return () => {
+      onrampInstance?.destroy();
+    };
+  }, []);
+
+  const handleClick = () => {
+    onrampInstance?.open();
+  };
+
+  return <Button onClick={handleClick} disabled={!onrampInstance}>Buy with Coinbase</Button>;
+};
+```
+
 
 ## Contributing
 
