@@ -52,7 +52,6 @@ export class CBPayInstance implements CBPayInstanceType {
       widget,
       experienceLoggedIn,
       experienceLoggedOut,
-      embeddedContentStyles,
       onExit,
       onSuccess,
       onEvent,
@@ -65,7 +64,6 @@ export class CBPayInstance implements CBPayInstanceType {
       path: widgetRoutes[widget],
       experienceLoggedIn,
       experienceLoggedOut,
-      embeddedContentStyles,
       onExit: () => {
         onExit?.();
         if (closeOnExit) {

@@ -4,17 +4,9 @@ export type WidgetType = 'buy' | 'checkout';
 
 export type IntegrationType = 'direct' | 'secure_standalone';
 
-export type Experience = 'embedded' | 'popup' | 'new_tab';
+export type Experience = 'popup' | 'new_tab';
 
 export type Theme = 'light' | 'dark';
-
-export type EmbeddedContentStyles = {
-  target?: string;
-  width?: string;
-  height?: string;
-  position?: string;
-  top?: string;
-};
 
 export type CBPayExperienceOptions<T> = {
   widgetParameters: T;
@@ -29,7 +21,6 @@ export type CBPayExperienceOptions<T> = {
   onRequestedUrl?: (url: string) => void;
   closeOnExit?: boolean;
   closeOnSuccess?: boolean;
-  embeddedContentStyles?: EmbeddedContentStyles;
   experienceLoggedIn?: Experience;
   experienceLoggedOut?: Experience;
 };

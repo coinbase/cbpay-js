@@ -12,7 +12,7 @@ export type InitOnRampCallback = {
 
 export const initOnRamp = (
   {
-    experienceLoggedIn = 'embedded', // default experience type
+    experienceLoggedIn = 'popup', // default experience type
     widgetParameters,
     ...options
   }: InitOnRampParams,

@@ -49,9 +49,6 @@ const options = {
   },
   closeOnExit: true,
   closeOnSuccess: true,
-  embeddedContentStyles: {
-    target: '#target-area',
-  },
   onExit: () => {
     alert('On Exit');
   },
