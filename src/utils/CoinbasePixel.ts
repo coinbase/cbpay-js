@@ -1,6 +1,5 @@
 import { DEFAULT_HOST } from '../config';
-import { EmbeddedContentStyles, Experience, Theme } from 'types/widget';
-import { createEmbeddedContent, EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
+import { Experience, Theme } from 'types/widget';
 import { JsonObject } from 'types/JsonTypes';
 import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
 import { EventMetadata } from 'types/events';
@@ -44,8 +43,20 @@ export type OpenExperienceOptions = {
   path: string;
   experienceLoggedIn: Experience;
   experienceLoggedOut?: Experience;
-  embeddedContentStyles?: EmbeddedContentStyles;
 } & ExperienceListeners;
+
+export const popupWindowFeatures = [
+  'copyhistory=no',
+  'directories=no',
+  'location=no',
+  'menubar=no',
+  'resizable=no',
+  'scrollbars=no',
+  'status=no',
+  'toolbar=no',
+  `height=${PopupSizes.signin.height}`,
+  `width=${PopupSizes.signin.width}`,
+].join(', ');
 
 export class CoinbasePixel {
   /**
@@ -71,6 +82,7 @@ export class CoinbasePixel {
   private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
   private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
   private theme: Theme | null | undefined;
+  private widgetWindow: Window | null;
 
   public isLoggedIn = false;
 
@@ -90,6 +102,7 @@ export class CoinbasePixel {
     this.onFallbackOpen = onFallbackOpen;
     this.debug = debug || false;
     this.theme = theme;
+    this.widgetWindow = null;
 
     this.addPixelReadyListener();
     this.addErrorListener();
@@ -132,7 +145,7 @@ export class CoinbasePixel {
 
     this.setupExperienceListeners(options);
 
-    const { path, experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
+    const { path, experienceLoggedIn, experienceLoggedOut } = options;
 
     const widgetUrl = new URL(`${this.host}${path}`);
     widgetUrl.searchParams.append('appId', this.appId);
@@ -151,23 +164,7 @@ export class CoinbasePixel {
 
     this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
 
-    if (experience === 'embedded') {
-      const openEmbeddedExperience = () => {
-        const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
-        if (embeddedContentStyles?.target) {
-          document.querySelector(embeddedContentStyles?.target)?.replaceChildren(embedded);
-        } else {
-          document.body.appendChild(embedded);
-        }
-      };
-
-      if (!this.isLoggedIn) {
-        // Embedded experience opens popup for signin
-        this.startDirectSignin(openEmbeddedExperience);
-      } else {
-        openEmbeddedExperience();
-      }
-    } else if (experience === 'popup' && window.chrome?.windows?.create) {
+    if (experience === 'popup' && window.chrome?.windows?.create) {
       void window.chrome.windows.create(
         {
           url,
@@ -195,7 +192,7 @@ export class CoinbasePixel {
     } else if (experience === 'new_tab' && window.chrome?.tabs?.create) {
       void window.chrome.tabs.create({ url });
     } else {
-      openWindow(url, experience);
+      this.widgetWindow = openWindow(url, experience);
     }
 
     // For users who exit the experience and want to re-enter, we need a fresh nonce to use.
@@ -209,7 +206,8 @@ export class CoinbasePixel {
   };
 
   public endExperience = (): void => {
-    document.getElementById(EMBEDDED_IFRAME_ID)?.remove();
+    this.widgetWindow?.close();
+    this.widgetWindow = null;
   };
 
   public destroy = (): void => {
@@ -394,11 +392,5 @@ function createPixel({ host, appId }: { host: string; appId: string }) {
 }
 
 function openWindow(url: string, experience: Experience) {
-  return window.open(
-    url,
-    'Coinbase',
-    experience === 'popup'
-      ? `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=${PopupSizes.signin.height},width=${PopupSizes.signin.width}`
-      : undefined,
-  );
+  return window.open(url, 'Coinbase', experience === 'popup' ? popupWindowFeatures : undefined);
 }

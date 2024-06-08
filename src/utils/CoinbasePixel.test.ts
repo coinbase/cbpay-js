@@ -3,8 +3,8 @@ import {
   PIXEL_ID,
   CoinbasePixelConstructorParams,
   OpenExperienceOptions,
+  popupWindowFeatures,
 } from './CoinbasePixel';
-import { EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
 
 import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
 
@@ -25,13 +25,14 @@ describe('CoinbasePixel', () => {
   };
   const defaultOpenOptions: OpenExperienceOptions = {
     path: '/buy',
-    experienceLoggedIn: 'embedded',
+    experienceLoggedIn: 'popup',
   };
 
   beforeEach(() => {
     mockOnReady = jest.fn();
     mockOnFallbackOpen = jest.fn();
     mockUnsubCallback = jest.fn();
+    (window.open as jest.Mock).mockReset();
     (onBroadcastedPostMessage as jest.Mock).mockReturnValue(mockUnsubCallback);
     defaultArgs = {
       appId: 'test',
@@ -43,7 +44,6 @@ describe('CoinbasePixel', () => {
 
   afterEach(() => {
     document.getElementById(PIXEL_ID)?.remove();
-    document.getElementById(EMBEDDED_IFRAME_ID)?.remove();
     // @ts-expect-error - test
     window.chrome = undefined;
     jest.resetAllMocks();
@@ -154,7 +154,11 @@ describe('CoinbasePixel', () => {
 
     pixel.openExperience(defaultOpenOptions);
 
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeTruthy();
+    expect(window.open).toHaveBeenCalledWith(
+      'https://pay.coinbase.com/buy?appId=test&type=secure_standalone&nonce=mock-nonce',
+      'Coinbase',
+      popupWindowFeatures,
+    );
   });
 
   it('should handle openExperience when pixel has status "loading"', () => {
@@ -163,7 +167,7 @@ describe('CoinbasePixel', () => {
     expect(instance.state).toEqual('loading');
     instance.openExperience(defaultOpenOptions);
 
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it('should handle openExperience when pixel has status "waiting_for_response"', () => {
@@ -173,7 +177,7 @@ describe('CoinbasePixel', () => {
     instance.openExperience(defaultOpenOptions);
 
     expect(instance.queuedOpenOptions).toBeFalsy();
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it('should handle openExperience when pixel has status "failed"', () => {
@@ -183,7 +187,7 @@ describe('CoinbasePixel', () => {
     instance.openExperience(defaultOpenOptions);
 
     expect(instance.queuedOpenOptions).toBeFalsy();
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it('should handle openExperience with no preloaded nonce', () => {
@@ -195,22 +199,7 @@ describe('CoinbasePixel', () => {
       'Attempted to open CB Pay experience without nonce',
     );
 
-    expect(document.querySelector(`iframe#${EMBEDDED_IFRAME_ID}`)).toBeFalsy();
-  });
-
-  it('should handle opening the embedded experience when logged out', () => {
-    const instance = createUntypedPixel(defaultArgs);
-
-    mockPixelReady(false);
-    mockOnAppParamsNonce('mock-nonce');
-    instance.openExperience(defaultOpenOptions);
-
-    expect(window.open).toHaveBeenCalledWith(
-      'https://pay.coinbase.com/signin?appId=test&type=direct',
-      'Coinbase',
-      'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=730,width=460',
-    );
-    expect(findMockedListeners('signin_success')).toHaveLength(1);
+    expect(window.open).not.toHaveBeenCalled();
   });
 
   it('should handle opening the popup experience in chrome extensions', () => {
@@ -271,7 +260,7 @@ describe('CoinbasePixel', () => {
     expect(window.open).toHaveBeenCalledWith(
       'https://pay.coinbase.com/buy?appId=test&type=secure_standalone&nonce=mock-nonce',
       'Coinbase',
-      'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=730,width=460',
+      popupWindowFeatures,
     );
   });
 
@@ -357,8 +346,4 @@ function mockOnAppParamsNonce(nonce: string) {
   onMessageCalls.forEach((call) => {
     call[1].onMessage({ nonce });
   });
-}
-
-function findMockedListeners(message: string) {
-  return (onBroadcastedPostMessage as jest.Mock).mock.calls.filter(([m]) => m === message);
 }
