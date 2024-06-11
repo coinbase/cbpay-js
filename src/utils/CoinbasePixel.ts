@@ -144,7 +144,7 @@ export class CoinbasePixel {
     onEvent,
     onRequestedUrl,
   }: ExperienceListeners) => {
-    // Unsubscribe from events in case there's still an active listnere
+    // Unsubscribe from events in case there's still an active listener
     if (this.removeEventListener) {
       this.removeEventListener();
     }
