@@ -1,7 +1,6 @@
 import { CBPayExperienceOptions } from '../types/widget';
 import { CBPayInstance, CBPayInstanceType } from '../utils/CBPayInstance';
 import { OnRampAppParams } from '../types/onramp';
-import { generateOnRampURL } from './generateOnRampURL';
 
 export type InitOnRampParams = CBPayExperienceOptions<OnRampAppParams>;
 
@@ -12,7 +11,7 @@ export type InitOnRampCallback = {
 
 export const initOnRamp = (
   {
-    experienceLoggedIn = 'embedded', // default experience type
+    experienceLoggedIn = 'new_tab', // default experience type
     widgetParameters,
     ...options
   }: InitOnRampParams,
@@ -23,21 +22,6 @@ export const initOnRamp = (
     widget: 'buy',
     experienceLoggedIn,
     appParams: widgetParameters,
-    onReady: (error) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        callback(null, instance);
-      }
-    },
-    onFallbackOpen: () => {
-      const url = generateOnRampURL({
-        appId: options.appId,
-        host: options.host,
-        theme: options.theme,
-        ...widgetParameters,
-      });
-      window.open(url);
-    },
   });
+  callback(null, instance);
 };

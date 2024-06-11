@@ -20,9 +20,6 @@ describe('initOnRamp', () => {
 
     expect(CBPayInstance).toHaveBeenCalledTimes(1);
 
-    // Trigger ready callback
-    (CBPayInstance as jest.Mock).mock.calls[0][0].onReady();
-
     expect(instance instanceof CBPayInstance).toBe(true);
   });
 
