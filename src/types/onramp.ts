@@ -13,7 +13,7 @@ export type DestinationWallet = {
   /**
    * List of assets enabled for the associated address. If blockchains is non-empty, these assets will be available in
    * addition to all assets supported by the networks in the blockchains field. If blockchains is empty, only these
-   * asset will be avaialable.
+   * asset will be available.
    */
   assets?: string[];
   /**
@@ -37,11 +37,11 @@ type BaseOnRampAppParams = {
    *
    * Support all assets that are available for sending on the base network, only on the base network:
    *
-   * [{ address: "0x1", blockchains: ["base"] }]
+   * `[{ address: "0x1", blockchains: ["base"] }]`
    *
    * Support only USDC on either the base network or the ethereum network:
    *
-   * [{ address: "0x1", assets: ["USDC"], supportedNetworks: ["base", "ethereum"] }]
+   * `[{ address: "0x1", assets: ["USDC"], supportedNetworks: ["base", "ethereum"] }]`
    *
    */
   destinationWallets?: DestinationWallet[];
@@ -57,7 +57,7 @@ type BaseOnRampAppParams = {
    *
    * Support all assets that are available for sending on the base network, only on the base network:
    *
-   * { "0x1": ["base"] }
+   * `{ "0x1": ["base"] }`
    */
   addresses?: Record<string, string[]>;
   /**
@@ -68,7 +68,7 @@ type BaseOnRampAppParams = {
    *
    * Support only USDC on either the base network or the ethereum network:
    *
-   * addresses: { "0x1": ["base", "ethereum"] }, assets: ["USDC"]
+   * `addresses: { "0x1": ["base", "ethereum"] }, assets: ["USDC"]`
    *
    * The values in this list can either be asset symbols like BTC, ETH, or asset UUIDs that you can get from the Buy
    * Options API {@link https://docs-cdp-onramp-preview.cbhq.net/onramp/docs/api-configurations/#buy-options}.
