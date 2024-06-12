@@ -27,8 +27,10 @@ export interface CBPayInstanceType {
 export class CBPayInstance implements CBPayInstanceType {
   private pixel: CoinbasePixel;
   private options: InternalExperienceOptions;
+  private targetElement: HTMLElement | null;
 
   constructor(options: CBPayInstanceConstructorArguments) {
+    this.targetElement = null;
     this.options = options;
     this.pixel = new CoinbasePixel({
       ...options,
@@ -39,9 +41,9 @@ export class CBPayInstance implements CBPayInstanceType {
     });
 
     if (options.target) {
-      const targetElement = document.querySelector(options.target);
-      if (targetElement) {
-        targetElement.addEventListener('click', this.open);
+      this.targetElement = document.querySelector(options.target);
+      if (this.targetElement) {
+        this.targetElement.addEventListener('click', this.open);
       }
     }
   }
@@ -83,6 +85,9 @@ export class CBPayInstance implements CBPayInstanceType {
   };
 
   public destroy = (): void => {
+    if (this.targetElement) {
+      this.targetElement.removeEventListener('click', this.open);
+    }
     this.pixel.destroy();
   };
 }
