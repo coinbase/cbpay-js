@@ -2,14 +2,9 @@ import { DEFAULT_HOST } from '../config';
 import { EmbeddedContentStyles, Experience, Theme } from 'types/widget';
 import { createEmbeddedContent, EMBEDDED_IFRAME_ID } from './createEmbeddedContent';
 import { JsonObject } from 'types/JsonTypes';
-import { broadcastPostMessage, onBroadcastedPostMessage } from './postMessage';
+import { onBroadcastedPostMessage } from './postMessage';
 import { EventMetadata } from 'types/events';
-
-const PIXEL_PATH = '/embed';
-
-/** Default time to wait before setting loading to "failed" state */
-const DEFAULT_MAX_LOAD_TIMEOUT = 5000;
-export const PIXEL_ID = 'coinbase-sdk-connect';
+import { generateOnRampURL } from '../onramp/generateOnRampURL';
 
 const PopupSizes: Record<'signin' | 'widget', { width: number; height: number }> = {
   signin: {
@@ -33,9 +28,6 @@ export type CoinbasePixelConstructorParams = {
   host?: string;
   appId: string;
   appParams: JsonObject;
-  onReady: (error?: Error) => void;
-  /** Fallback open callback when the pixel failed to load */
-  onFallbackOpen?: () => void;
   debug?: boolean;
   theme?: Theme;
 };
@@ -48,110 +40,52 @@ export type OpenExperienceOptions = {
 } & ExperienceListeners;
 
 export class CoinbasePixel {
-  /**
-   * Tracks the loading state of the embedded pixel
-   * - loading: Attempting to embed iframe, waiting for pixel ready message.
-   * - ready:   Received pixel_ready message to indicate listeners are ready.
-   * - failed:  Failed to load the pixel or an error occurred while loading pixel context.
-   * - waiting_for_response:  Waiting for a post message response.
-   */
-  private state: 'loading' | 'ready' | 'waiting_for_response' | 'failed' = 'loading';
   private debug: boolean;
-
   private host: string;
-  private pixelIframe?: HTMLIFrameElement;
   private appId: string;
-  private nonce = '';
   private eventStreamListeners: Partial<Record<EventMetadata['eventName'], (() => void)[]>> = {};
   private unsubs: (() => void)[] = [];
   private appParams: JsonObject;
-  /** This will be called when the pixel successfully initializes to the error listener event. */
-  private removeErrorListener?: () => void;
-  /** onReady callback which should be triggered when a nonce has successfully been retrieved */
-  private onReadyCallback: CoinbasePixelConstructorParams['onReady'];
-  private onFallbackOpen: CoinbasePixelConstructorParams['onFallbackOpen'];
+  private removeEventListener?: () => void;
   private theme: Theme | null | undefined;
-
-  public isLoggedIn = false;
 
   constructor({
     host = DEFAULT_HOST,
     appId,
     appParams,
-    onReady,
-    onFallbackOpen,
     debug,
     theme,
   }: CoinbasePixelConstructorParams) {
     this.host = host;
     this.appId = appId;
     this.appParams = appParams;
-    this.onReadyCallback = onReady;
-    this.onFallbackOpen = onFallbackOpen;
     this.debug = debug || false;
     this.theme = theme;
-
-    this.addPixelReadyListener();
-    this.addErrorListener();
-    this.embedPixel();
-
-    // Setup a timeout for errors that might stop the window from loading i.e. CSP
-    setTimeout(() => {
-      if (this.state !== 'ready') {
-        this.onFailedToLoad();
-      }
-    }, DEFAULT_MAX_LOAD_TIMEOUT);
   }
 
   /** Opens the CB Pay experience */
   public openExperience = (options: OpenExperienceOptions): void => {
-    this.log('Attempting to open experience', { state: this.state });
-
-    // Avoid double clicking when we are waiting on a response for a new nonce
-    if (this.state === 'waiting_for_response') {
-      return;
-    }
-
-    // Still waiting on pixel to load. Queue the options.
-    if (this.state === 'loading') {
-      return;
-    }
-
-    // Pixel failed to load or ran into a critical error, run fallback if provided.
-    if (this.state === 'failed') {
-      this.onFallbackOpen?.();
-      return;
-    }
-
-    if (!this.nonce) {
-      throw new Error('Attempted to open CB Pay experience without nonce');
-    }
-
-    const nonce = this.nonce;
-    this.nonce = '';
+    this.log('Attempting to open experience');
 
     this.setupExperienceListeners(options);
 
-    const { path, experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
+    const { experienceLoggedIn, experienceLoggedOut, embeddedContentStyles } = options;
 
-    const widgetUrl = new URL(`${this.host}${path}`);
-    widgetUrl.searchParams.append('appId', this.appId);
-    widgetUrl.searchParams.append('type', 'secure_standalone');
+    const experience = experienceLoggedOut || experienceLoggedIn;
 
-    if (this.theme) {
-      widgetUrl.searchParams.append('theme', this.theme);
-    }
+    const url = generateOnRampURL({
+      appId: this.appId,
+      host: this.host,
+      theme: this.theme ?? undefined,
+      ...this.appParams,
+    });
 
-    const experience = this.isLoggedIn
-      ? experienceLoggedIn
-      : experienceLoggedOut || experienceLoggedIn;
-
-    widgetUrl.searchParams.append('nonce', nonce);
-    const url = widgetUrl.toString();
-
-    this.log('Opening experience', { experience, isLoggedIn: this.isLoggedIn });
+    this.log('Opening experience', { experience });
 
     if (experience === 'embedded') {
+      this.log(
+        'DEPRECATION WARNING: Two factor authentication does not work in an iframe, so the embedded experience should not be used. It will be removed in a future release',
+      );
       const openEmbeddedExperience = () => {
         const embedded = createEmbeddedContent({ url, ...embeddedContentStyles });
         if (embeddedContentStyles?.target) {
@@ -161,12 +95,7 @@ export class CoinbasePixel {
         }
       };
 
-      if (!this.isLoggedIn) {
-        // Embedded experience opens popup for signin
-        this.startDirectSignin(openEmbeddedExperience);
-      } else {
-        openEmbeddedExperience();
-      }
+      this.startDirectSignin(openEmbeddedExperience);
     } else if (experience === 'popup' && window.chrome?.windows?.create) {
       void window.chrome.windows.create(
         {
@@ -180,7 +109,7 @@ export class CoinbasePixel {
           top: window.screenTop,
         },
         (winRef) => {
-          this.addEventStreamListener('open', () => {
+          const onOpenCallback = () => {
             if (winRef?.id) {
               chrome.windows.update(winRef.id, {
                 width: PopupSizes.widget.width,
@@ -188,8 +117,10 @@ export class CoinbasePixel {
                 left: window.screenLeft - PopupSizes.widget.width - 10,
                 top: window.screenTop,
               });
+              this.removeEventStreamListener('open', onOpenCallback);
             }
-          });
+          };
+          this.addEventStreamListener('open', onOpenCallback);
         },
       );
     } else if (experience === 'new_tab' && window.chrome?.tabs?.create) {
@@ -197,15 +128,6 @@ export class CoinbasePixel {
     } else {
       openWindow(url, experience);
     }
-
-    // For users who exit the experience and want to re-enter, we need a fresh nonce to use.
-    // Additionally, if we trigger sendAppParams too early we'll invalidate the nonce they're opening in this current attempt.
-    // Adding an event listener for when the widget opens allows us to safely request a new nonce for another session.
-    const onOpen = () => {
-      this.sendAppParams();
-      this.removeEventStreamListener('open', onOpen);
-    };
-    this.addEventStreamListener('open', onOpen);
   };
 
   public endExperience = (): void => {
@@ -213,97 +135,7 @@ export class CoinbasePixel {
   };
 
   public destroy = (): void => {
-    document.getElementById(PIXEL_ID)?.remove();
     this.unsubs.forEach((unsub) => unsub());
-  };
-
-  /** Adds a listener for when the pixel is ready and requests an app params nonce when ready */
-  private addPixelReadyListener = (): void => {
-    this.onMessage('pixel_ready', {
-      shouldUnsubscribe: false,
-      onMessage: (data) => {
-        this.log('Received message: pixel_ready');
-        this.isLoggedIn = !!data?.isLoggedIn as boolean;
-
-        this.removeErrorListener?.();
-        this.sendAppParams(() => {
-          this.onReadyCallback?.();
-        });
-      },
-    });
-  };
-
-  private addErrorListener = (): void => {
-    this.removeErrorListener = this.onMessage('error', {
-      shouldUnsubscribe: true,
-      onMessage: (data) => {
-        this.log('Received message: error');
-
-        if (data) {
-          const message = typeof data === 'string' ? data : JSON.stringify(data);
-          this.onReadyCallback?.(new Error(message));
-        }
-      },
-    });
-  };
-
-  /** Creates and adds the pixel to the document */
-  private embedPixel = (): void => {
-    document.getElementById(PIXEL_ID)?.remove();
-    const pixel = createPixel({
-      host: this.host,
-      appId: this.appId,
-    });
-
-    pixel.onerror = this.onFailedToLoad;
-
-    this.pixelIframe = pixel;
-    document.body.appendChild(pixel);
-  };
-
-  /** Failed to load the pixel iframe */
-  private onFailedToLoad = () => {
-    this.state = 'failed';
-
-    // If a fallback option is provided we only want to provide a warning since we can still attempt to open the widget
-    if (this.onFallbackOpen) {
-      if (this.debug) {
-        console.warn('Failed to load CB Pay pixel. Falling back to opening in new tab.');
-      }
-      this.onReadyCallback?.();
-    } else {
-      const error = new Error('Failed to load CB Pay pixel');
-      if (this.debug) {
-        console.error(error);
-      }
-      // If no fallback option provided we're in a critical error state
-      this.onReadyCallback?.(error);
-    }
-  };
-
-  private sendAppParams = (callback?: () => void): void => {
-    // Fetch a new nonce from the pixel
-    if (this.pixelIframe?.contentWindow) {
-      this.log('Sending message: app_params');
-      this.onMessage('on_app_params_nonce', {
-        onMessage: (data) => {
-          this.state = 'ready';
-          this.nonce = (data?.nonce as string) || '';
-          callback?.();
-        },
-      });
-
-      this.state = 'waiting_for_response';
-      broadcastPostMessage(this.pixelIframe.contentWindow, 'app_params', {
-        data: this.appParams,
-      });
-    } else {
-      // Shouldn't be here after loading the pixel.
-      console.error('Failed to find pixel content window');
-      // Set the pixel to the failed state and attempt to open using the fallback method.
-      this.state = 'failed';
-      this.onFallbackOpen?.();
-    }
   };
 
   private setupExperienceListeners = ({
@@ -312,7 +144,12 @@ export class CoinbasePixel {
     onEvent,
     onRequestedUrl,
   }: ExperienceListeners) => {
-    this.onMessage('event', {
+    // Unsubscribe from events in case there's still an active listener
+    if (this.removeEventListener) {
+      this.removeEventListener();
+    }
+
+    this.removeEventListener = this.onMessage('event', {
       shouldUnsubscribe: false,
       onMessage: (data) => {
         const metadata = data as EventMetadata;
@@ -375,22 +212,6 @@ export class CoinbasePixel {
       console.log('[CBPAY]', ...args);
     }
   };
-}
-
-function createPixel({ host, appId }: { host: string; appId: string }) {
-  const pixel = document.createElement('iframe');
-  pixel.style.border = 'unset';
-  pixel.style.borderWidth = '0';
-  pixel.style.width = '0';
-  pixel.style.height = '0';
-  pixel.style.height = '0';
-  pixel.id = PIXEL_ID;
-
-  const url = new URL(`${host}${PIXEL_PATH}`);
-  url.searchParams.append('appId', appId);
-  pixel.src = url.toString();
-
-  return pixel;
 }
 
 function openWindow(url: string, experience: Experience) {

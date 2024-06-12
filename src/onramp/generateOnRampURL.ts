@@ -5,28 +5,33 @@ import type { Theme } from '../types/widget';
 export type GenerateOnRampURLOptions = {
   /** This & destinationWallets or sessionToken are required. */
   appId?: string;
-  destinationWallets?: OnRampAppParams['destinationWallets'];
   host?: string;
   /** This or appId & destinationWallets are required. */
   sessionToken?: string;
   theme?: Theme;
-} & Omit<OnRampAppParams, 'destinationWallets'>;
+} & OnRampAppParams;
 
 export const generateOnRampURL = ({
   host = DEFAULT_HOST,
-  destinationWallets,
-  ...otherParams
+  ...props
 }: GenerateOnRampURLOptions): string => {
   const url = new URL(host);
   url.pathname = '/buy/select-asset';
 
-  if (destinationWallets !== undefined) {
-    url.searchParams.append('destinationWallets', JSON.stringify(destinationWallets));
+  if (props.destinationWallets && props.addresses) {
+    throw new Error('Only one of destinationWallets or addresses can be provided');
+  } else if (!props.destinationWallets && !props.addresses) {
+    throw new Error('One of destinationWallets or addresses must be provided');
   }
-  (Object.keys(otherParams) as (keyof typeof otherParams)[]).forEach((key) => {
-    const value = otherParams[key];
+
+  (Object.keys(props) as (keyof typeof props)[]).forEach((key) => {
+    const value = props[key];
     if (value !== undefined) {
-      url.searchParams.append(key, value.toString());
+      if (['string', 'number', 'boolean'].includes(typeof value)) {
+        url.searchParams.append(key, value.toString());
+      } else {
+        url.searchParams.append(key, JSON.stringify(value));
+      }
     }
   });
 

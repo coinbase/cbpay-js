@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2024-06-11
+- Added new `addresses` and `assets` initialization parameters to simplify `destinationWallets`
+- Marked the `destinationWallets` initialization parameter as deprecated
+- Added warning message about upcoming deprecation of the embedded experience
+- Simplified the `CoinbasePixel` class to improve widget initialization latency
+- Fix example code in README
+
 ## [2.1.0] - 2024-03-14
 - Add `theme` parameter
 
