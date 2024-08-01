@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2024-08-01
+- Added `redirectUrl` widget parameter
+
 ## [2.2.0] - 2024-06-11
 - Added new `addresses` and `assets` initialization parameters to simplify `destinationWallets`
 - Marked the `destinationWallets` initialization parameter as deprecated

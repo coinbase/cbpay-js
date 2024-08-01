@@ -71,7 +71,7 @@ type BaseOnRampAppParams = {
    * `addresses: { "0x1": ["base", "ethereum"] }, assets: ["USDC"]`
    *
    * The values in this list can either be asset symbols like BTC, ETH, or asset UUIDs that you can get from the Buy
-   * Options API {@link https://docs-cdp-onramp-preview.cbhq.net/onramp/docs/api-configurations/#buy-options}.
+   * Options API {@link https://docs.cdp.coinbase.com/onramp/docs/api-configurations/#buy-options}.
    */
   assets?: string[];
   /** The preset input amount as a crypto value. i.e. 0.1 ETH. This will be the initial default for all cryptocurrencies. */
@@ -89,6 +89,9 @@ type BaseOnRampAppParams = {
   handlingRequestedUrls?: boolean;
   /** ID used to link all user transactions created during the session. */
   partnerUserId?: string;
+  /** A URL that the user will be automatically redirected to after a successful buy/send. The domain must match a domain
+   * on the domain allowlist in Coinbase Developer Platform (https://portal.cdp.coinbase.com/products/onramp). */
+  redirectUrl?: string;
 };
 
 export type OnRampAggregatorAppParams = {
