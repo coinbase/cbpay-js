@@ -5,15 +5,22 @@ describe('generateOffRampURL', () => {
     const url = new URL(
       generateOffRampURL({
         appId: 'test',
-        addresses: { '0x1': ['base'] },
-        redirectUrl: 'https://example.com',
       }),
     );
 
     expect(url.origin).toEqual('https://pay.coinbase.com');
     expect(url.pathname).toEqual('/v3/offramp/input');
     expect(url.searchParams.get('appId')).toEqual('test');
-    expect(url.searchParams.get('addresses')).toEqual('{"0x1":["base"]}');
+  });
+
+  it('should support redirectUrl', () => {
+    const url = new URL(
+      generateOffRampURL({
+        appId: 'test',
+        redirectUrl: 'https://example.com',
+      }),
+    );
+
     expect(url.searchParams.get('redirectUrl')).toEqual('https://example.com');
   });
 
@@ -45,7 +52,6 @@ describe('generateOffRampURL', () => {
           '90123jd09ef09df': ['solana'],
         },
         assets: ['USDC', 'SOL'],
-        redirectUrl: 'https://example.com',
       }),
     );
 
@@ -60,8 +66,6 @@ describe('generateOffRampURL', () => {
       generateOffRampURL({
         host: 'http://localhost:3000',
         appId: 'test',
-        addresses: { '0x1': ['base'] },
-        redirectUrl: 'https://example.com',
       }),
     );
 
@@ -74,8 +78,6 @@ describe('generateOffRampURL', () => {
     const url = new URL(
       generateOffRampURL({
         appId: 'test',
-        addresses: { '0x1': ['base'] },
-        redirectUrl: 'https://example.com',
         presetCryptoAmount: 0.1,
         presetFiatAmount: 20,
       }),
@@ -89,8 +91,6 @@ describe('generateOffRampURL', () => {
     const url = new URL(
       generateOffRampURL({
         appId: 'test',
-        addresses: { '0x1': ['base'] },
-        redirectUrl: 'https://example.com',
         defaultNetwork: 'ethereum',
       }),
     );

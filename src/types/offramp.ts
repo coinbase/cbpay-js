@@ -11,9 +11,9 @@ export type BaseOffRampAppParams = {
    *
    * `{ "0x1": ["base"] }`
    */
-  addresses: Record<string, string[]>;
+  addresses?: Record<string, string[]>;
   /** A URL that the user will be redirected to after to sign their transaction after the transaction has been committed. */
-  redirectUrl: string;
+  redirectUrl?: string;
   /**
    * This optional parameter will restrict the assets available for the user to cash out. It acts as a filter on the
    * networks specified in the {addresses} param.
