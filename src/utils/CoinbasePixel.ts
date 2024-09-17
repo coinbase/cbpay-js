@@ -26,7 +26,8 @@ export type ExperienceListeners = {
 
 export type CoinbasePixelConstructorParams = {
   host?: string;
-  appId: string;
+  appId?: string;
+  sessionToken?: string;
   appParams: JsonObject;
   debug?: boolean;
   theme?: Theme;
@@ -42,7 +43,8 @@ export type OpenExperienceOptions = {
 export class CoinbasePixel {
   private debug: boolean;
   private host: string;
-  private appId: string;
+  private appId: string | undefined;
+  private sessionToken: string | undefined;
   private eventStreamListeners: Partial<Record<EventMetadata['eventName'], (() => void)[]>> = {};
   private unsubs: (() => void)[] = [];
   private appParams: JsonObject;
@@ -52,12 +54,14 @@ export class CoinbasePixel {
   constructor({
     host = DEFAULT_HOST,
     appId,
+    sessionToken,
     appParams,
     debug,
     theme,
   }: CoinbasePixelConstructorParams) {
     this.host = host;
     this.appId = appId;
+    this.sessionToken = sessionToken;
     this.appParams = appParams;
     this.debug = debug || false;
     this.theme = theme;
@@ -75,6 +79,7 @@ export class CoinbasePixel {
 
     const url = generateOnRampURL({
       appId: this.appId,
+      sessionToken: this.sessionToken,
       host: this.host,
       theme: this.theme ?? undefined,
       ...this.appParams,
@@ -171,6 +176,10 @@ export class CoinbasePixel {
   };
 
   private startDirectSignin = (callback: () => void) => {
+    if (!this.appId) {
+      throw new Error('appId is required for direct signin');
+    }
+
     const queryParams = new URLSearchParams();
     queryParams.set('appId', this.appId);
     queryParams.set('type', 'direct');

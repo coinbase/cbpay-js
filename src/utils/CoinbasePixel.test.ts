@@ -50,6 +50,12 @@ describe('CoinbasePixel', () => {
     expect(instance.appParams).toEqual(defaultArgs.appParams);
   });
 
+  it('should initialize with sessionToken', () => {
+    const instance = createUntypedPixel({ sessionToken: 'test', appParams: defaultAppParams });
+
+    expect(instance.sessionToken).toEqual('test');
+  });
+
   it('should handle opening the embedded experience when logged out', () => {
     const instance = createUntypedPixel(defaultArgs);
 
