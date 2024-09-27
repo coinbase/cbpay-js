@@ -61,6 +61,13 @@ type BaseOnRampAppParams = {
    */
   addresses?: Record<string, string[]>;
   /**
+   * The session token used to initialize the Coinbase Onramp experience.
+   * This token expires after a short period of time and can only be used once.
+   * A new token must be obtained for every new session.
+   * @see https://docs.cdp.coinbase.com/onramp/docs/api-initializing#getting-an-onramp-session-token
+   */
+  sessionToken?: string;
+  /**
    * This optional parameter will restrict the assets available for the user to buy/send. It acts as a filter on the
    * networks specified in the {addresses} param.
    *

@@ -20,19 +20,10 @@ export type EmbeddedContentStyles = {
   top?: string;
 };
 
-export type CBPayExperienceWithAppId<T> = {
-  appId: string;
-  sessionToken?: never;
-} & CBPayExperienceBaseOptions<T>;
-
-export type CBPayExperienceWithSessionToken<T> = {
-  sessionToken: string;
-  appId?: never;
-} & CBPayExperienceBaseOptions<T>;
-
-type CBPayExperienceBaseOptions<T> = {
+export type CBPayExperienceOptions<T> = {
   widgetParameters: T;
   target?: string;
+  appId: string;
   host?: string;
   debug?: boolean;
   theme?: Theme;
@@ -46,7 +37,3 @@ type CBPayExperienceBaseOptions<T> = {
   experienceLoggedIn?: Experience;
   experienceLoggedOut?: Experience;
 };
-
-export type CBPayExperienceOptions<T> =
-  | CBPayExperienceWithAppId<T>
-  | CBPayExperienceWithSessionToken<T>;
