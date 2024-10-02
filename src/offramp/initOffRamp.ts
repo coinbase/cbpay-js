@@ -19,7 +19,7 @@ export const initOffRamp = (
 ): void => {
   const instance = new CBPayInstance({
     ...options,
-    widget: 'offramp',
+    widget: 'sell',
     experienceLoggedIn,
     appParams: widgetParameters,
   });
