@@ -13,7 +13,7 @@ export const generateOffRampURL = ({
   ...props
 }: GenerateOffRampURLOptions): string => {
   const url = new URL(host);
-  url.pathname = '/v3/offramp/input';
+  url.pathname = '/v3/sell/input';
 
   (Object.keys(props) as (keyof typeof props)[]).forEach((key) => {
     const value = props[key];

@@ -75,7 +75,7 @@ export class CoinbasePixel {
     const experience = experienceLoggedOut || experienceLoggedIn;
 
     let url = '';
-    if (options.path === '/v3/offramp') {
+    if (options.path === '/v3/sell') {
       url = generateOffRampURL({
         appId: this.appId,
         host: this.host,

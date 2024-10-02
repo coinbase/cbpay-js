@@ -120,11 +120,11 @@ describe('CoinbasePixel', () => {
     instance.openExperience({
       ...defaultOpenOptions,
       experienceLoggedIn: 'new_tab',
-      path: '/v3/offramp',
+      path: '/v3/sell',
     });
 
     expect(window.chrome.tabs.create).toHaveBeenCalledWith({
-      url: 'https://pay.coinbase.com/v3/offramp/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
+      url: 'https://pay.coinbase.com/v3/sell/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
     });
   });
 
@@ -146,11 +146,11 @@ describe('CoinbasePixel', () => {
     instance.openExperience({
       ...defaultOpenOptions,
       experienceLoggedIn: 'popup',
-      path: '/v3/offramp',
+      path: '/v3/sell',
     });
 
     expect(window.open).toHaveBeenCalledWith(
-      'https://pay.coinbase.com/v3/offramp/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
+      'https://pay.coinbase.com/v3/sell/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
       'Coinbase',
       'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=730,width=460',
     );
@@ -174,11 +174,11 @@ describe('CoinbasePixel', () => {
     instance.openExperience({
       ...defaultOpenOptions,
       experienceLoggedIn: 'new_tab',
-      path: '/v3/offramp',
+      path: '/v3/sell',
     });
 
     expect(window.open).toHaveBeenCalledWith(
-      'https://pay.coinbase.com/v3/offramp/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
+      'https://pay.coinbase.com/v3/sell/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
       'Coinbase',
       undefined,
     );

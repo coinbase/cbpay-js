@@ -9,7 +9,7 @@ describe('generateOffRampURL', () => {
     );
 
     expect(url.origin).toEqual('https://pay.coinbase.com');
-    expect(url.pathname).toEqual('/v3/offramp/input');
+    expect(url.pathname).toEqual('/v3/sell/input');
     expect(url.searchParams.get('appId')).toEqual('test');
   });
 
@@ -70,7 +70,7 @@ describe('generateOffRampURL', () => {
     );
 
     expect(url.origin).toEqual('http://localhost:3000');
-    expect(url.pathname).toEqual('/v3/offramp/input');
+    expect(url.pathname).toEqual('/v3/sell/input');
     expect(url.searchParams.get('appId')).toEqual('test');
   });
 
