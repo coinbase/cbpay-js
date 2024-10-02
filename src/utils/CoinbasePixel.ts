@@ -90,7 +90,6 @@ export class CoinbasePixel {
         ...this.appParams,
       });
     }
-    console.log({ url });
 
     this.log('Opening experience', { experience });
 

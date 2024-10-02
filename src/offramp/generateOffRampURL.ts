@@ -3,9 +3,12 @@ import { DEFAULT_HOST } from '../config';
 import type { Theme } from '../types/widget';
 
 export type GenerateOffRampURLOptions = {
-  appId: string;
+  /** This & addresses or sessionToken are required. */
+  appId?: string;
   host?: string;
   theme?: Theme;
+  /** This or appId & addresses are required. */
+  sessionToken?: string;
 } & OffRampAppParams;
 
 export const generateOffRampURL = ({
