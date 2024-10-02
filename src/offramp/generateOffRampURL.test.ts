@@ -96,4 +96,15 @@ describe('generateOffRampURL', () => {
     );
     expect(url.searchParams.get('defaultNetwork')).toEqual('ethereum');
   });
+
+  it('should support sessionToken', () => {
+    const url = new URL(
+      generateOffRampURL({
+        sessionToken: 'test',
+      }),
+    );
+    expect(url.origin).toEqual('https://pay.coinbase.com');
+    expect(url.pathname).toEqual('/v3/sell/input');
+    expect(url.searchParams.get('sessionToken')).toEqual('test');
+  });
 });
