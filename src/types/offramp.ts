@@ -5,11 +5,12 @@ export type BaseOffRampAppParams = {
    * single address for each network your app supports. Users will be able to cash out any owned assets supported by any of
    * the networks you specify. See the assets parameter if you want to restrict the available assets.
    *
-   * Some common examples:
+   * Example:
    *
-   * Show all assets users have on the base network, only on the base network:
+   * Show all assets users have on the base, only on the base network:
    *
    * `{ "0x1": ["base"] }`
+   *
    */
   addresses?: Record<string, string[]>;
   /** A URL that the user will be redirected to after to sign their transaction after the transaction has been committed. */
@@ -18,7 +19,7 @@ export type BaseOffRampAppParams = {
    * This optional parameter will restrict the assets available for the user to cash out. It acts as a filter on the
    * networks specified in the {addresses} param.
    *
-   * Some common examples:
+   * Example:
    *
    * Support only USDC on either the base network or the ethereum network:
    *
@@ -41,12 +42,12 @@ export type BaseOffRampAppParams = {
 };
 
 export type OffRampAggregatorAppParams = {
-  quoteId: string;
-  defaultAsset: string;
+  quoteId?: string;
+  defaultAsset?: string;
   defaultNetwork?: string;
-  defaultCashoutMethod: string; // "CRYPTO_ACCOUNT" | "FIAT_WALLET" | "CARD" | "ACH_BANK_ACCOUNT" | "PAYPAL"
-  presetFiatAmount: number;
-  fiatCurrency: string;
+  defaultCashoutMethod?: string; // "CRYPTO_ACCOUNT" | "FIAT_WALLET" | "CARD" | "ACH_BANK_ACCOUNT" | "PAYPAL"
+  presetFiatAmount?: number;
+  fiatCurrency?: string;
 };
 
 export type OffRampAppParams =
