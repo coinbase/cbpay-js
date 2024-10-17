@@ -7,7 +7,7 @@ export type BaseOffRampAppParams = {
    *
    * Example:
    *
-   * Show all assets users have on the base, only on the base network:
+   * Show all assets users have on the base network, only on the base network:
    *
    * `{ "0x1": ["base"] }`
    *
