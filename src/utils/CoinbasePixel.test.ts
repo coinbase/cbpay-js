@@ -107,6 +107,27 @@ describe('CoinbasePixel', () => {
     });
   });
 
+  it('should handle opening offramp the new_tab experience in chrome extensions', () => {
+    window.chrome = {
+      // @ts-expect-error - test
+      tabs: {
+        create: jest.fn(),
+      },
+    };
+
+    const instance = new CoinbasePixel(defaultArgs);
+
+    instance.openExperience({
+      ...defaultOpenOptions,
+      experienceLoggedIn: 'new_tab',
+      path: '/v3/sell',
+    });
+
+    expect(window.chrome.tabs.create).toHaveBeenCalledWith({
+      url: 'https://pay.coinbase.com/v3/sell/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
+    });
+  });
+
   it('should handle opening the popup experience in browsers', () => {
     const instance = new CoinbasePixel(defaultArgs);
 
@@ -119,6 +140,22 @@ describe('CoinbasePixel', () => {
     );
   });
 
+  it('should handle opening offramp in the popup experience in browsers', () => {
+    const instance = new CoinbasePixel(defaultArgs);
+
+    instance.openExperience({
+      ...defaultOpenOptions,
+      experienceLoggedIn: 'popup',
+      path: '/v3/sell',
+    });
+
+    expect(window.open).toHaveBeenCalledWith(
+      'https://pay.coinbase.com/v3/sell/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
+      'Coinbase',
+      'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, height=730,width=460',
+    );
+  });
+
   it('should handle opening the new_tab experience in browsers', () => {
     const instance = new CoinbasePixel(defaultArgs);
 
@@ -126,6 +163,22 @@ describe('CoinbasePixel', () => {
 
     expect(window.open).toHaveBeenCalledWith(
       'https://pay.coinbase.com/buy/select-asset?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
+      'Coinbase',
+      undefined,
+    );
+  });
+
+  it('should handle opening the offramp experience in new_tab in browsers', () => {
+    const instance = createUntypedPixel(defaultArgs);
+
+    instance.openExperience({
+      ...defaultOpenOptions,
+      experienceLoggedIn: 'new_tab',
+      path: '/v3/sell',
+    });
+
+    expect(window.open).toHaveBeenCalledWith(
+      'https://pay.coinbase.com/v3/sell/input?addresses=%7B%220x0%22%3A%5B%22ethereum%22%5D%7D&appId=test',
       'Coinbase',
       undefined,
     );

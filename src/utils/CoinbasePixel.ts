@@ -5,6 +5,7 @@ import { JsonObject } from 'types/JsonTypes';
 import { onBroadcastedPostMessage } from './postMessage';
 import { EventMetadata } from 'types/events';
 import { generateOnRampURL } from '../onramp/generateOnRampURL';
+import { generateOffRampURL } from '../offramp/generateOffRampURL';
 
 const PopupSizes: Record<'signin' | 'widget', { width: number; height: number }> = {
   signin: {
@@ -73,12 +74,22 @@ export class CoinbasePixel {
 
     const experience = experienceLoggedOut || experienceLoggedIn;
 
-    const url = generateOnRampURL({
-      appId: this.appId,
-      host: this.host,
-      theme: this.theme ?? undefined,
-      ...this.appParams,
-    });
+    let url = '';
+    if (options.path === '/v3/sell') {
+      url = generateOffRampURL({
+        appId: this.appId,
+        host: this.host,
+        theme: this.theme ?? undefined,
+        ...this.appParams,
+      });
+    } else {
+      url = generateOnRampURL({
+        appId: this.appId,
+        host: this.host,
+        theme: this.theme ?? undefined,
+        ...this.appParams,
+      });
+    }
 
     this.log('Opening experience', { experience });
 

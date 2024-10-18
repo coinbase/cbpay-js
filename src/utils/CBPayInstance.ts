@@ -17,6 +17,7 @@ export type CBPayInstanceConstructorArguments = {
 const widgetRoutes: Record<WidgetType, string> = {
   buy: '/buy',
   checkout: '/checkout',
+  sell: '/v3/sell',
 };
 
 export interface CBPayInstanceType {

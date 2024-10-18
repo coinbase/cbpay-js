@@ -1,6 +1,6 @@
 import { EventMetadata } from './events';
 
-export type WidgetType = 'buy' | 'checkout';
+export type WidgetType = 'buy' | 'checkout' | 'sell';
 
 export type IntegrationType = 'direct' | 'secure_standalone';
 
