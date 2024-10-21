@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] - 2024-10-21
+- Add Offramp support with `generateOffRampURL` and `initOffRamp` functions
+
 ## [2.2.1] - 2024-08-01
 - Added `redirectUrl` widget parameter
 
