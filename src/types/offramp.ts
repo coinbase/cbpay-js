@@ -45,7 +45,7 @@ export type OffRampAggregatorAppParams = {
   quoteId?: string;
   defaultAsset?: string;
   defaultNetwork?: string;
-  defaultCashoutMethod?: string; // "CRYPTO_ACCOUNT" | "FIAT_WALLET" | "CARD" | "ACH_BANK_ACCOUNT" | "PAYPAL"
+  defaultCashoutMethod?: string; // "CRYPTO_WALLET" | "FIAT_WALLET" | "CARD" | "ACH_BANK_ACCOUNT" | "PAYPAL"
   presetFiatAmount?: number;
   fiatCurrency?: string;
 };
