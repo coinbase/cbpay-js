@@ -48,6 +48,7 @@ export type OffRampAggregatorAppParams = {
   defaultCashoutMethod?: string; // "CRYPTO_WALLET" | "FIAT_WALLET" | "CARD" | "ACH_BANK_ACCOUNT" | "PAYPAL"
   presetFiatAmount?: number;
   fiatCurrency?: string;
+  disableEdit?: boolean;
 };
 
 export type OffRampAppParams =
