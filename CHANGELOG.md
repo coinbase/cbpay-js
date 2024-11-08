@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] - 2024-11-08
+- Add `disableEdit` offramp parameter
+
 ## [2.3.0] - 2024-10-21
 - Add Offramp support with `generateOffRampURL` and `initOffRamp` functions
 
