@@ -19,12 +19,31 @@ describe('generateOnrampURL', () => {
     const url = new URL(
       generateOnRampURL({
         sessionToken: 'test',
-        destinationWallets: [],
       }),
     );
     expect(url.origin).toEqual('https://pay.coinbase.com');
     expect(url.pathname).toEqual('/buy/select-asset');
     expect(url.searchParams.get('sessionToken')).toEqual('test');
+  });
+
+  it('should throw when both sessionToken and destinationWallets or addresses are provided', () => {
+    expect(() =>
+      generateOnRampURL({
+        sessionToken: 'test',
+        destinationWallets: [],
+      }),
+    ).toThrowError(
+      'When sessionToken is provided, destinationWallets and addresses should not be specified',
+    );
+
+    expect(() =>
+      generateOnRampURL({
+        sessionToken: 'test',
+        addresses: {},
+      }),
+    ).toThrowError(
+      'When sessionToken is provided, destinationWallets and addresses should not be specified',
+    );
   });
 
   it('generates URL with empty destination wallets', () => {
