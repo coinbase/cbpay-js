@@ -12,3 +12,10 @@ jobs:
       uses: federacy/scan-action@0.1.4
       with:
         active_scanners: "\n  - PatternSearch\n  - Semgrep\n  - Trufflehog\n  - YarnAudit"
+        salus_configuration: |
+          scanner_configs:
+            YarnAudit:
+              exceptions:
+                - advisory_id: 1102664
+                  changed_by: sumxu96
+                  notes: "Low severity DOM Clobbering vulnerability in tsup with no patch available"
