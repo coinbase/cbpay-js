@@ -18,10 +18,18 @@ export const generateOnRampURL = ({
   const url = new URL(host);
   url.pathname = '/buy/select-asset';
 
-  if (props.destinationWallets && props.addresses) {
-    throw new Error('Only one of destinationWallets or addresses can be provided');
-  } else if (!props.destinationWallets && !props.addresses) {
-    throw new Error('One of destinationWallets or addresses must be provided');
+  if (props.sessionToken) {
+    if (props.destinationWallets || props.addresses) {
+      throw new Error(
+        'When sessionToken is provided, destinationWallets and addresses should not be specified',
+      );
+    }
+  } else {
+    if (props.destinationWallets && props.addresses) {
+      throw new Error('Only one of destinationWallets or addresses can be provided');
+    } else if (!props.destinationWallets && !props.addresses) {
+      throw new Error('One of destinationWallets or addresses must be provided');
+    }
   }
 
   (Object.keys(props) as (keyof typeof props)[]).forEach((key) => {
