@@ -6,9 +6,14 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
     - name: Salus Scan
       id: salus_scan
-      uses: federacy/scan-action@0.1.4
+      uses: federacy/scan-action@a7039b38cf9b90d3c27e27f4cedfbf153ab3da62 # 0.1.4
       with:
         active_scanners: "\n  - PatternSearch\n  - Semgrep\n  - Trufflehog\n  - YarnAudit"
