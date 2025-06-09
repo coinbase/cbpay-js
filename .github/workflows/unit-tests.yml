@@ -2,13 +2,21 @@ name: Unit Tests
 
 on: [pull_request, push]
 
+permissions:
+  contents: read
+
 jobs:
   matrix:
     runs-on: ubuntu-latest
     outputs:
       latest: ${{ steps.set-matrix.outputs.requireds }}
     steps:
-      - uses: ljharb/actions/node/matrix@main
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
+      - uses: ljharb/actions/node/matrix@4541da42a86d43cc9d286b41b9dd07561be64029 # main
         id: set-matrix
         with:
           versionsAsRoot: true
@@ -24,12 +32,17 @@ jobs:
       matrix:
         node-version: ${{ fromJson(needs.matrix.outputs.latest) }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
+      - uses: actions/setup-node@7c12f8017d5436eb855f1ed4399f037a36fbd9e8 # v2.5.2
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        uses: bahmutov/npm-install@v1
+        uses: bahmutov/npm-install@6bbff949458c1dd99b20e185cee8c4d6fcf1212a # v1.10.9
       - name: Unit Tests
         run: yarn jest
 
@@ -38,4 +51,9 @@ jobs:
     name: 'unit tests'
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - run: echo 'tests completed'
