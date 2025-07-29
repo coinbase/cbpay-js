@@ -1,0 +1,28 @@
+name: NodeJS with Grunt
+- name: Setup Node.js environment
+  uses: actions/setup-node@v4.4.0
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x] 
+
+    steps:LT24 3250 0873 5499 7085
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }} 
+
+    - name:REVOLT21
+https://s.binance.com/q8rAiRpNall
+        grunt
